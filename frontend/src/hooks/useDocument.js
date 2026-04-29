@@ -1,10 +1,8 @@
 import { useState, useCallback } from 'react'
 import * as pdfjsLib from 'pdfjs-dist'
+import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.mjs',
-  import.meta.url,
-).toString()
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024
 const SUPPORTED_TYPES = new Set([

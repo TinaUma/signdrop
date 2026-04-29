@@ -2,6 +2,17 @@ import { useRef, useEffect, useState, useCallback } from 'react'
 import { Stage, Layer, Image as KonvaImage, Transformer } from 'react-konva'
 import { useCanvas } from '../hooks/useCanvas'
 
+function PageBackground({ dataUrl, width, height }) {
+  const [img, setImg] = useState(null)
+  useEffect(() => {
+    if (!dataUrl) return
+    const image = new window.Image()
+    image.src = dataUrl
+    image.onload = () => setImg(image)
+  }, [dataUrl])
+  return img ? <KonvaImage image={img} x={0} y={0} width={width} height={height} listening={false} /> : null
+}
+
 function SignatureNode({ layer, isSelected, onSelect, onChange, imageUrl }) {
   const imgRef = useRef(null)
   const trRef = useRef(null)
@@ -58,7 +69,7 @@ function SignatureNode({ layer, isSelected, onSelect, onChange, imageUrl }) {
   )
 }
 
-export function CanvasEditor({ pageDataUrl, pageWidth = 800, pageHeight = 1100, imageUrl, onLayersChange }) {
+export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, imageUrl, onLayersChange }) {
   const { layers, addSignature, updateLayer, removeLayer, undo, redo, canUndo, canRedo } = useCanvas()
   const [selectedId, setSelectedId] = useState(null)
   const stageRef = useRef(null)
@@ -79,16 +90,29 @@ export function CanvasEditor({ pageDataUrl, pageWidth = 800, pageHeight = 1100, 
     return () => window.removeEventListener('keydown', handler)
   }, [selectedId, removeLayer, undo, redo])
 
-  // Drop signature from library onto canvas
+  // Drop signature from library — load image to get natural aspect ratio, cap at 25% page width
   const handleDrop = useCallback((e) => {
     e.preventDefault()
     const data = e.dataTransfer.getData('application/signature')
     if (!data) return
     const sig = JSON.parse(data)
     const stage = stageRef.current
+    if (!stage) return
     const rect = stage.container().getBoundingClientRect()
-    addSignature(sig, e.clientX - rect.left, e.clientY - rect.top)
-  }, [addSignature])
+    const dropX = e.clientX - rect.left
+    const dropY = e.clientY - rect.top
+
+    const img = new window.Image()
+    img.src = imageUrl(sig.id)
+    img.onload = () => {
+      const maxW = pageWidth * 0.25
+      const scale = Math.min(maxW / Math.max(img.naturalWidth, 1), maxW / Math.max(img.naturalHeight * (img.naturalWidth / Math.max(img.naturalHeight, 1)), 1))
+      const w = Math.max(20, Math.round(img.naturalWidth * (maxW / Math.max(img.naturalWidth, 1))))
+      const h = Math.max(20, Math.round(img.naturalHeight * (maxW / Math.max(img.naturalWidth, 1))))
+      addSignature(sig, dropX - w / 2, dropY - h / 2, w, h)
+    }
+    img.onerror = () => addSignature(sig, dropX, dropY)
+  }, [addSignature, imageUrl, pageWidth])
 
   const selectedLayer = layers.find((l) => l.id === selectedId)
 
@@ -108,6 +132,7 @@ export function CanvasEditor({ pageDataUrl, pageWidth = 800, pageHeight = 1100, 
           onMouseDown={(e) => { if (e.target === e.target.getStage()) setSelectedId(null) }}
         >
           <Layer>
+            <PageBackground dataUrl={pageDataUrl} width={pageWidth} height={pageHeight} />
             {layers.map((layer) => (
               <SignatureNode
                 key={layer.id}

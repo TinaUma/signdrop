@@ -4,13 +4,13 @@ import { useHistory } from './useHistory'
 export function useCanvas() {
   const { state: layers, push, undo, redo, canUndo, canRedo } = useHistory([])
 
-  const addSignature = useCallback((sig, x = 100, y = 100) => {
+  const addSignature = useCallback((sig, x = 100, y = 100, width = 200, height = 80) => {
     push([...layers, {
       id: `${sig.id}-${Date.now()}`,
       sigId: sig.id,
       x, y,
-      width: 200,
-      height: 100,
+      width: Math.max(20, width),
+      height: Math.max(20, height),
       rotation: 0,
       opacity: 1,
     }])

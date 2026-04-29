@@ -6,14 +6,27 @@ import { CanvasEditor } from './components/CanvasEditor'
 
 const ALLOWED = '.pdf,.jpg,.jpeg,.png,.tiff,.tif,.webp'
 
+const CHECKER = {
+  backgroundImage: `linear-gradient(45deg,#ccc 25%,transparent 25%),
+    linear-gradient(-45deg,#ccc 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,#ccc 75%),
+    linear-gradient(-45deg,transparent 75%,#ccc 75%)`,
+  backgroundSize: '8px 8px',
+  backgroundPosition: '0 0,0 4px,4px -4px,-4px 0',
+}
+
 export default function App() {
   const doc = useDocument()
   const sigs = useSignatures()
   const [mode, setMode] = useState('view')
   const [exporting, setExporting] = useState(false)
   const [exportError, setExportError] = useState(null)
-  const canvasLayersRef = useRef([])   // current page layers from CanvasEditor
-  const sourceFileRef = useRef(null)   // original File object
+  const [removeBg, setRemoveBg] = useState(true)
+  const [uploading, setUploading] = useState(false)
+  const [sigError, setSigError] = useState(null)
+  const canvasLayersRef = useRef([])
+  const sourceFileRef = useRef(null)
+  const sigInputRef = useRef(null)
 
   const handleFileInput = (e) => {
     const f = e.target.files?.[0]
@@ -28,7 +41,10 @@ export default function App() {
   const handleSigUpload = async (e) => {
     const f = e.target.files?.[0]
     if (!f) return
-    try { await sigs.upload(f, true) } catch (err) { alert(err.message) }
+    setSigError(null)
+    setUploading(true)
+    try { await sigs.upload(f, removeBg) } catch (err) { setSigError(err.message) }
+    finally { setUploading(false); e.target.value = '' }
   }
 
   const handleLayersChange = useCallback((layers) => {
@@ -78,25 +94,60 @@ export default function App() {
       {/* Left: Signature Library */}
       <aside className="w-56 bg-white border-r flex flex-col text-xs">
         <div className="px-3 py-2 border-b font-semibold text-gray-700">Подписи</div>
-        <label className="m-2 flex items-center justify-center border-2 border-dashed border-gray-300 rounded p-2 text-gray-400 cursor-pointer hover:border-blue-400 text-center">
-          + Загрузить подпись
-          <input type="file" accept=".jpg,.jpeg,.png,.tiff,.tif,.webp" onChange={handleSigUpload} className="hidden" />
-        </label>
-        {sigs.loading && <p className="px-3 py-1 text-gray-400">Загрузка…</p>}
+
+        {/* Step 1 — toggle bg removal */}
+        <div className="px-3 pt-2 pb-1">
+          <p className="text-gray-400 mb-1">Шаг 1 — настройки загрузки</p>
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <div
+              onClick={() => setRemoveBg(v => !v)}
+              className={`w-8 h-4 rounded-full transition-colors flex-shrink-0 relative ${removeBg ? 'bg-blue-500' : 'bg-gray-300'}`}
+            >
+              <span className={`absolute top-0.5 w-3 h-3 bg-white rounded-full shadow transition-transform ${removeBg ? 'translate-x-4' : 'translate-x-0.5'}`} />
+            </div>
+            <span className={removeBg ? 'text-blue-600 font-medium' : 'text-gray-400'}>
+              Удалить фон
+            </span>
+          </label>
+          {removeBg && <p className="text-gray-400 mt-0.5 ml-10">rembg · ИИ-удаление</p>}
+        </div>
+
+        {/* Step 2 — upload */}
+        <div className="px-3 pb-2">
+          <p className="text-gray-400 mb-1">Шаг 2 — загрузи подпись</p>
+          <button
+            onClick={() => sigInputRef.current?.click()}
+            disabled={uploading}
+            className="w-full border-2 border-dashed border-gray-300 rounded p-2 text-gray-400 hover:border-blue-400 hover:text-blue-500 transition-colors disabled:opacity-50 text-center"
+          >
+            {uploading ? '⏳ Обработка…' : '+ Загрузить подпись'}
+          </button>
+          <input ref={sigInputRef} type="file" accept=".jpg,.jpeg,.png,.tiff,.tif,.webp" onChange={handleSigUpload} className="hidden" />
+          {sigError && <p className="text-red-500 mt-1">{sigError}</p>}
+        </div>
+
+        <div className="px-3 pb-1 border-t pt-2">
+          <p className="text-gray-400">Шаг 3 — перетащи на документ</p>
+        </div>
+
+        {/* Signatures list */}
         <div className="flex-1 overflow-y-auto">
           {sigs.signatures.map((sig) => (
             <div key={sig.id}
               draggable
               onDragStart={(e) => e.dataTransfer.setData('application/signature', JSON.stringify(sig))}
+              title="Перетащи на документ"
               className="flex items-center gap-2 px-2 py-1.5 hover:bg-blue-50 cursor-grab group"
             >
-              <img src={sigs.imageUrl(sig.id)} alt="" className="w-14 h-8 object-contain bg-gray-100 rounded" />
+              <div style={CHECKER} className="w-14 h-8 rounded flex-shrink-0 flex items-center justify-center">
+                <img src={sigs.imageUrl(sig.id)} alt="" className="w-14 h-8 object-contain" />
+              </div>
               <span className="flex-1 text-gray-400 truncate">{sig.id.slice(0, 6)}…</span>
               <button onClick={() => sigs.remove(sig.id)} className="text-red-400 opacity-0 group-hover:opacity-100 px-1">✕</button>
             </div>
           ))}
           {!sigs.loading && sigs.signatures.length === 0 && (
-            <p className="px-3 py-2 text-gray-400">Нет подписей</p>
+            <p className="px-3 py-2 text-gray-400 italic">Нет сохранённых подписей</p>
           )}
         </div>
       </aside>
