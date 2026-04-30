@@ -105,10 +105,11 @@ export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, 
     const img = new window.Image()
     img.src = imageUrl(sig.id)
     img.onload = () => {
+      if (!img.naturalWidth) { addSignature(sig, dropX, dropY); return }
       const maxW = pageWidth * 0.25
-      const scale = Math.min(maxW / Math.max(img.naturalWidth, 1), maxW / Math.max(img.naturalHeight * (img.naturalWidth / Math.max(img.naturalHeight, 1)), 1))
-      const w = Math.max(20, Math.round(img.naturalWidth * (maxW / Math.max(img.naturalWidth, 1))))
-      const h = Math.max(20, Math.round(img.naturalHeight * (maxW / Math.max(img.naturalWidth, 1))))
+      const scale = Math.min(maxW / img.naturalWidth, 1)
+      const w = Math.max(20, Math.round(img.naturalWidth * scale))
+      const h = Math.max(20, Math.round(img.naturalHeight * scale))
       addSignature(sig, dropX - w / 2, dropY - h / 2, w, h)
     }
     img.onerror = () => addSignature(sig, dropX, dropY)

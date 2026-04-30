@@ -180,7 +180,7 @@ export default function App() {
                 {mode === 'sign' && (
                   <button onClick={handleExport} disabled={exporting}
                     className="px-3 py-1 rounded text-sm bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50">
-                    {exporting ? 'Экспорт…' : '💾 Вплавить и сохранить'}
+                    {exporting ? 'Экспорт…' : '💾 Вставить и сохранить'}
                   </button>
                 )}
               </div>

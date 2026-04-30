@@ -6,8 +6,13 @@ from PIL import Image
 def compose_page(
     page_img: Image.Image, signatures: list[dict], sig_dir: Path
 ) -> Image.Image:
-    """Overlay signatures onto a page image. Returns new RGBA image."""
-    result = page_img.convert("RGBA")
+    """Overlay signatures onto a page image. Returns RGB image with white background."""
+    base = Image.new("RGB", page_img.size, (255, 255, 255))
+    if page_img.mode == "RGBA":
+        base.paste(page_img.convert("RGB"), mask=page_img.split()[3])
+    else:
+        base.paste(page_img.convert("RGB"))
+    result = base.convert("RGBA")
 
     for sig in signatures:
         sig_path = sig_dir / f"{sig['id']}.png"
