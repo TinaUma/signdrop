@@ -61,11 +61,11 @@ export default function App() {
     try {
       const layers = canvasLayersRef.current
       const pagesPayload = layers.length > 0
-        ? [{ page_idx: doc.currentPage, signatures: layers.map((l) => ({
+        ? [{ page_idx: doc.currentPage, stage_w: 794, stage_h: 1123, signatures: layers.map((l) => ({
             id: l.sigId, x: l.x, y: l.y, w: l.width, h: l.height,
             angle: l.rotation, opacity: l.opacity,
           })) }]
-        : [{ page_idx: doc.currentPage, signatures: [] }]
+        : [{ page_idx: doc.currentPage, stage_w: 794, stage_h: 1123, signatures: [] }]
 
       const form = new FormData()
       form.append('file', sourceFileRef.current)

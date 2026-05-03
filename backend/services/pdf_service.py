@@ -27,7 +27,7 @@ def _render_pdf(data: bytes) -> list[str]:
     doc = fitz.open(stream=data, filetype="pdf")
     pages = []
     for page in doc:
-        pix = page.get_pixmap(dpi=150)
+        pix = page.get_pixmap(dpi=200)
         png_bytes = pix.tobytes("png")
         pages.append(base64.b64encode(png_bytes).decode())
     doc.close()

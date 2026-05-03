@@ -65,9 +65,28 @@ async def export_document(
 
     elif ext in {".jpg", ".jpeg", ".png", ".tiff", ".tif", ".webp"}:
         img = Image.open(io.BytesIO(data))
-        sigs = pages_payload[0]["signatures"] if pages_payload else []
-        _validate_signatures(sigs, img.width, img.height)
-        composed = compose_page(img, sigs, get_signatures_dir())
+        page_info = pages_payload[0] if pages_payload else {}
+        sigs = page_info.get("signatures", [])
+        stage_w = page_info.get("stage_w", 0)
+        stage_h = page_info.get("stage_h", 0)
+        if not stage_w or not stage_h:
+            raise HTTPException(
+                status_code=422, detail="stage_w and stage_h are required"
+            )
+        sx = img.width / stage_w
+        sy = img.height / stage_h
+        scaled_sigs = [
+            {
+                **s,
+                "x": s["x"] * sx,
+                "y": s["y"] * sy,
+                "w": s["w"] * sx,
+                "h": s["h"] * sy,
+            }
+            for s in sigs
+        ]
+        _validate_signatures(scaled_sigs, img.width, img.height)
+        composed = compose_page(img, scaled_sigs, get_signatures_dir())
         buf = io.BytesIO()
         composed.convert("RGB").save(buf, format="JPEG")
         result_bytes = buf.getvalue()

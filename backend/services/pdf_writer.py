@@ -18,11 +18,29 @@ def export_pdf(pdf_data: bytes, pages_payload: list[dict]) -> bytes:
 
     page_map = {p["page_idx"]: p["signatures"] for p in pages_payload}
 
+    stage_map = {
+        p["page_idx"]: (p.get("stage_w", 794), p.get("stage_h", 1123))
+        for p in pages_payload
+    }
+
     for i, page in enumerate(src):
         if i in page_map and page_map[i]:
-            pix = page.get_pixmap(dpi=150)
+            pix = page.get_pixmap(dpi=200)
             img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-            composed = compose_page(img, page_map[i], sig_dir)
+            stage_w, stage_h = stage_map.get(i, (794, 1123))
+            sx = pix.width / stage_w
+            sy = pix.height / stage_h
+            scaled_sigs = [
+                {
+                    **s,
+                    "x": s["x"] * sx,
+                    "y": s["y"] * sy,
+                    "w": s["w"] * sx,
+                    "h": s["h"] * sy,
+                }
+                for s in page_map[i]
+            ]
+            composed = compose_page(img, scaled_sigs, sig_dir)
 
             buf = io.BytesIO()
             composed.convert("RGB").save(buf, format="PNG")
