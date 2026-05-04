@@ -2,12 +2,15 @@
 
 # PDF Signer
 
-**Инструмент наложения рукописной подписи на документы**  
+**Инструмент для наложения рукописной подписи на документы**  
 **A tool for placing handwritten signatures on documents**
 
-[![Status](https://img.shields.io/badge/status-in%20development-yellow)](https://github.com/TinaUma/PDF_Signer)
-[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Stack](https://img.shields.io/badge/stack-FastAPI%20%7C%20React%20%7C%20Tauri-informational)](https://github.com/TinaUma/PDF_Signer)
+[![Status](https://img.shields.io/badge/status-v1.0%20ready-brightgreen)](https://github.com/TinaUma/PDF_Signer)
+[![Python](https://img.shields.io/badge/python-3.11-blue?logo=python&logoColor=white)](https://python.org)
+[![React](https://img.shields.io/badge/react-18-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Docker](https://img.shields.io/badge/docker-compose-2496ED?logo=docker&logoColor=white)](https://docker.com)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
 [Русский](#русский) · [English](#english)
 
@@ -21,74 +24,72 @@
 
 ### Что это
 
-PDF Signer — кроссплатформенный инструмент для наложения рукописной подписи (скан или фото) на документы форматов PDF, JPEG, PNG. Работает **полностью офлайн** — никакие данные не покидают ваше устройство.
+PDF Signer — инструмент для наложения рукописной подписи (скан или фото) на документы PDF, JPEG, PNG. Работает **полностью локально** — никакие данные не покидают устройство. Без облаков, без регистрации.
 
-> Принцип: запустил → открыл файл → подписал → сохранил.
+> Запустил → открыл файл → перетащил подпись → сохранил.
+
+### Скриншоты
+
+<div align="center">
+
+![Интерфейс с подписью](screenshots/itog%20%20c%20podpisaniem.PNG)
+
+*Документ подписан — подпись точно в нужном месте*
+
+![Поворот подписи](screenshots/povorotPODPISI.PNG)
+
+*Поворот, масштаб, прозрачность — полный контроль*
+
+</div>
 
 ### Возможности
 
-- 📄 Загрузка PDF (многостраничный) и изображений (JPG, PNG, TIFF, WEBP)
+- 📄 PDF (многостраничный) и изображения — JPG, PNG, TIFF, WEBP до 50 МБ
 - ✍️ Библиотека подписей — загрузи один раз, используй всегда
-- 🪄 Автоматическое удаление фона подписи (нейросеть rembg, офлайн)
-- 🎨 Опциональная векторизация подписи в SVG (vtracer)
-- 🖱️ Интерактивный холст — drag & drop, resize, rotate, прозрачность
-- ↩️ Undo / Redo — до 20 шагов отмены
-- 💾 Экспорт в PDF, JPEG, PNG — оригинал не изменяется
+- 🪄 Автоматическое удаление фона — адаптивный алгоритм на основе яркости, работает офлайн
+- 🖱️ Интерактивный холст — drag & drop, resize, **rotate**, прозрачность
+- ↩️ Undo / Redo — в тулбаре и через Ctrl+Z / Ctrl+Y
+- 💾 Экспорт PDF и JPEG — оригинал не изменяется
 - 🔒 Всё локально — никаких облаков, никакой регистрации
 
-### Варианты запуска
+### Быстрый старт
 
-| Вариант | Описание |
-|---|---|
-| **Docker** | `docker compose up` → открыть браузер на `localhost:8080` |
-| **Нативный .exe / .app** | Скачать релиз, запустить — Python не нужен |
-
-### Быстрый старт (Docker)
+**Требования:** Docker Desktop
 
 ```bash
 git clone https://github.com/TinaUma/PDF_Signer.git
 cd PDF_Signer
 docker compose up
-# Открыть http://localhost:8080
 ```
 
-Подписи сохраняются в смонтированной папке `./data/signatures/` и не пропадают между перезапусками.
+Открыть в браузере: **http://localhost:8080**
 
-### Стек
+Подписи сохраняются в `./data/signatures/` и не пропадают между перезапусками.
+
+### Как пользоваться
+
+1. **Загрузи подпись** — левая панель → «+ Загрузить подпись» (JPG, PNG)  
+   Фон удалится автоматически, можно отключить тумблером
+2. **Открой документ** — кнопка «Открыть документ» или перетащи файл
+3. **Режим подписи** — нажми «Разместить свою подпись»
+4. **Перетащи** подпись из библиотеки на документ
+5. **Настрой** — двигай, масштабируй, крути, меняй прозрачность
+6. **Сохрани** — «Вставить и сохранить» → скачается готовый файл
+
+### Стек технологий
 
 | Слой | Технология |
 |---|---|
-| Frontend | React 18 + Vite + Tailwind CSS + **Konva.js** |
-| Backend | FastAPI + Python 3.11 |
-| PDF | PyMuPDF (render + write) · pdfjs-dist (браузер) |
-| Удаление фона | rembg (U2Net, офлайн) |
-| Векторизация | vtracer (Rust, офлайн) |
-| Нативная оболочка | **Tauri v2** (Rust + WebView) |
-| Упаковка | Docker · PyInstaller sidecar · GitHub Actions |
-
-### Статус проекта
-
-> 🚧 **В разработке** — v1.0 MVP
-
-| Задача | Статус |
-|---|---|
-| Scaffold: структура, Docker, FastAPI, React | 🔲 В плане |
-| Загрузка и просмотр документов | 🔲 В плане |
-| Библиотека подписей (rembg, хранение) | 🔲 В плане |
-| Холст редактора (Konva.js, drag/resize/rotate) | 🔲 В плане |
-| Экспорт (вплавление подписи в PDF) | 🔲 В плане |
-| Tauri нативный билд + финальный Docker-образ | 🔲 В плане |
-
-### Что НЕ входит в v1.0
-
-- Авторизация и аккаунты
-- Облачное хранение
-- Юридически значимая ЭЦП (PKI)
-- История операций *(запланирована в v2.0)*
+| Frontend | React 18 · Vite · Tailwind CSS · **Konva.js** |
+| Backend | **FastAPI** · Python 3.11 · Uvicorn |
+| PDF | **PyMuPDF** (рендер + запись) |
+| Удаление фона | Алгоритм на основе яркости пикселей · NumPy · Pillow |
+| Упаковка | **Docker Compose** · nginx |
 
 ### Автор
 
-Разработано [Умашевой Т.](https://github.com/TinaUma) · портфолио-проект
+Разработано [Умашевой Т.](https://github.com/TinaUma) · портфолио-проект  
+AI-ассистент: [Claude Code](https://claude.ai/code) by Anthropic
 
 ---
 
@@ -98,74 +99,72 @@ docker compose up
 
 ### What is it
 
-PDF Signer is a cross-platform tool for placing a handwritten signature (scan or photo) on PDF and image documents. Works **completely offline** — no data ever leaves your device.
+PDF Signer is a tool for placing a handwritten signature (scan or photo) onto PDF and image documents. Works **completely offline** — no data ever leaves your device. No cloud, no registration.
 
-> Workflow: launch → open file → sign → save.
+> Launch → open file → drag your signature → save.
+
+### Screenshots
+
+<div align="center">
+
+![Interface with signature](screenshots/itog%20%20c%20podpisaniem.PNG)
+
+*Document signed — signature placed exactly where needed*
+
+![Signature rotation](screenshots/povorotPODPISI.PNG)
+
+*Rotate, scale, opacity — full control*
+
+</div>
 
 ### Features
 
-- 📄 Load PDFs (multi-page) and images (JPG, PNG, TIFF, WEBP)
+- 📄 PDF (multi-page) and images — JPG, PNG, TIFF, WEBP up to 50 MB
 - ✍️ Signature library — upload once, reuse anytime
-- 🪄 Automatic background removal via rembg (neural network, offline)
-- 🎨 Optional SVG vectorization (vtracer)
-- 🖱️ Interactive canvas — drag & drop, resize, rotate, opacity control
-- ↩️ Undo / Redo — up to 20 steps
-- 💾 Export to PDF, JPEG, PNG — original file stays untouched
+- 🪄 Automatic background removal — luminance-based adaptive algorithm, works offline
+- 🖱️ Interactive canvas — drag & drop, resize, **rotate**, opacity control
+- ↩️ Undo / Redo — in the toolbar and via Ctrl+Z / Ctrl+Y
+- 💾 Export to PDF and JPEG — original file stays untouched
 - 🔒 Fully local — no cloud, no registration
 
-### Deployment options
+### Quick Start
 
-| Option | Description |
-|---|---|
-| **Docker** | `docker compose up` → open browser at `localhost:8080` |
-| **Native .exe / .app** | Download release, run it — no Python required |
-
-### Quick start (Docker)
+**Requirements:** Docker Desktop
 
 ```bash
 git clone https://github.com/TinaUma/PDF_Signer.git
 cd PDF_Signer
 docker compose up
-# Open http://localhost:8080
 ```
 
-Signatures are stored in the mounted folder `./data/signatures/` and persist across restarts.
+Open in browser: **http://localhost:8080**
 
-### Tech stack
+Signatures are stored in `./data/signatures/` and persist across restarts.
+
+### How to use
+
+1. **Upload your signature** — left panel → "+ Upload signature" (JPG, PNG)  
+   Background is removed automatically; toggle to disable
+2. **Open a document** — click "Open document" or drag & drop a file
+3. **Sign mode** — click "Place your signature"
+4. **Drag** a signature from the library onto the document
+5. **Adjust** — move, scale, rotate, set opacity
+6. **Save** — "Embed & Save" → the signed file downloads automatically
+
+### Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 18 + Vite + Tailwind CSS + **Konva.js** |
-| Backend | FastAPI + Python 3.11 |
-| PDF | PyMuPDF (render + write) · pdfjs-dist (browser) |
-| Background removal | rembg (U2Net, offline) |
-| Vectorization | vtracer (Rust, offline) |
-| Native shell | **Tauri v2** (Rust + WebView) |
-| Packaging | Docker · PyInstaller sidecar · GitHub Actions |
-
-### Project status
-
-> 🚧 **In development** — v1.0 MVP
-
-| Task | Status |
-|---|---|
-| Scaffold: structure, Docker, FastAPI, React | 🔲 Planned |
-| Document loading & viewer | 🔲 Planned |
-| Signature library (rembg, storage) | 🔲 Planned |
-| Canvas editor (Konva.js, drag/resize/rotate) | 🔲 Planned |
-| Export (burn signature into PDF) | 🔲 Planned |
-| Tauri native build + final Docker image | 🔲 Planned |
-
-### Out of scope for v1.0
-
-- Auth and user accounts
-- Cloud storage
-- Legally binding digital signatures (PKI)
-- Operation history *(planned for v2.0)*
+| Frontend | React 18 · Vite · Tailwind CSS · **Konva.js** |
+| Backend | **FastAPI** · Python 3.11 · Uvicorn |
+| PDF | **PyMuPDF** (render + write) |
+| Background removal | Luminance-based pixel algorithm · NumPy · Pillow |
+| Packaging | **Docker Compose** · nginx |
 
 ### Author
 
-Built by [TinaUma](https://github.com/TinaUma) · portfolio project
+Built by [TinaUma](https://github.com/TinaUma) · portfolio project  
+AI assistant: [Claude Code](https://claude.ai/code) by Anthropic
 
 ---
 
