@@ -32,7 +32,11 @@ PDF Signer — инструмент для наложения рукописно
 
 <div align="center">
 
-![Интерфейс с подписью](screenshots/itog%20%20c%20podpisaniem.PNG)
+![Интерфейс — пошаговые подсказки и подпись на документе](screenshots/UXbest.PNG)
+
+*Пошаговые подсказки в сайдбаре, канвас сразу готов к работе, кнопка экспорта активируется когда подпись размещена*
+
+![Результат — подписанный документ](screenshots/itog%20%20c%20podpisaniem.PNG)
 
 *Документ подписан — подпись точно в нужном месте*
 
@@ -50,6 +54,8 @@ PDF Signer — инструмент для наложения рукописно
 - 🖱️ Интерактивный холст — drag & drop, resize, **rotate**, прозрачность
 - ↩️ Undo / Redo — в тулбаре и через Ctrl+Z / Ctrl+Y
 - 💾 Экспорт PDF и JPEG — оригинал не изменяется
+- 🧭 Пошаговые подсказки — сайдбар ведёт по шагам, активный шаг подсвечен
+- ⚡ Без переключения режимов — канвас готов сразу после загрузки документа
 - 🔒 Всё локально — никаких облаков, никакой регистрации
 
 ### Быстрый старт
@@ -107,7 +113,11 @@ PDF Signer is a tool for placing a handwritten signature (scan or photo) onto PD
 
 <div align="center">
 
-![Interface with signature](screenshots/itog%20%20c%20podpisaniem.PNG)
+![Interface — step guide and signature on document](screenshots/UXbest.PNG)
+
+*Step-by-step hints in sidebar, canvas ready immediately, export button activates once a signature is placed*
+
+![Result — signed document](screenshots/itog%20%20c%20podpisaniem.PNG)
 
 *Document signed — signature placed exactly where needed*
 
@@ -125,6 +135,8 @@ PDF Signer is a tool for placing a handwritten signature (scan or photo) onto PD
 - 🖱️ Interactive canvas — drag & drop, resize, **rotate**, opacity control
 - ↩️ Undo / Redo — in the toolbar and via Ctrl+Z / Ctrl+Y
 - 💾 Export to PDF and JPEG — original file stays untouched
+- 🧭 Step-by-step hints — sidebar guides through the workflow, active step highlighted
+- ⚡ No mode switching — canvas is ready immediately after loading a document
 - 🔒 Fully local — no cloud, no registration
 
 ### Quick Start

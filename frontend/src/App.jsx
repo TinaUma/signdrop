@@ -15,15 +15,22 @@ const CHECKER = {
   backgroundPosition: '0 0,0 4px,4px -4px,-4px 0',
 }
 
+const STEPS = [
+  { n: 1, text: 'Открой документ' },
+  { n: 2, text: 'Загрузи подпись' },
+  { n: 3, text: 'Перетащи на документ' },
+  { n: 4, text: 'Нажми «Вставить и сохранить»' },
+]
+
 export default function App() {
   const doc = useDocument()
   const sigs = useSignatures()
-  const [mode, setMode] = useState('view')
   const [exporting, setExporting] = useState(false)
   const [exportError, setExportError] = useState(null)
   const [removeBg, setRemoveBg] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [sigError, setSigError] = useState(null)
+  const [hasSigs, setHasSigs] = useState(false)
   const canvasLayersRef = useRef([])
   const sourceFileRef = useRef(null)
   const sigInputRef = useRef(null)
@@ -33,15 +40,13 @@ export default function App() {
 
   const handleFileInput = (e) => {
     const f = e.target.files?.[0]
-    if (f) { sourceFileRef.current = f; doc.loadFile(f); setMode('view') }
+    if (f) { sourceFileRef.current = f; doc.loadFile(f) }
   }
   const handleDrop = (e) => {
     e.preventDefault()
-    // Ignore drops that came from the signature library (CanvasEditor stops propagation,
-    // but guard here too in case the drop lands outside the canvas area)
     if (e.dataTransfer.types.includes('application/signature')) return
     const f = e.dataTransfer?.files?.[0]
-    if (f) { sourceFileRef.current = f; doc.loadFile(f); setMode('view') }
+    if (f) { sourceFileRef.current = f; doc.loadFile(f) }
   }
 
   const handleSigUpload = async (e) => {
@@ -55,20 +60,19 @@ export default function App() {
 
   const handleLayersChange = useCallback((layers) => {
     canvasLayersRef.current = layers
+    setHasSigs(layers.length > 0)
   }, [])
 
   const handleExport = async () => {
-    if (!sourceFileRef.current) return
+    if (!sourceFileRef.current || !hasSigs) return
     setExporting(true)
     setExportError(null)
     try {
       const layers = canvasLayersRef.current
-      const pagesPayload = layers.length > 0
-        ? [{ page_idx: doc.currentPage, stage_w: 794, stage_h: 1123, signatures: layers.map((l) => ({
-            id: l.sigId, x: l.x, y: l.y, w: l.width, h: l.height,
-            angle: l.rotation, opacity: l.opacity,
-          })) }]
-        : [{ page_idx: doc.currentPage, stage_w: 794, stage_h: 1123, signatures: [] }]
+      const pagesPayload = [{ page_idx: doc.currentPage, stage_w: 794, stage_h: 1123, signatures: layers.map((l) => ({
+          id: l.sigId, x: l.x, y: l.y, w: l.width, h: l.height,
+          angle: l.rotation, opacity: l.opacity,
+        })) }]
 
       const form = new FormData()
       form.append('file', sourceFileRef.current)
@@ -94,6 +98,11 @@ export default function App() {
     }
   }
 
+  const docLoaded = doc.totalPages > 0
+
+  // Step progress: 1=open doc, 2=upload sig, 3=drag to doc, 4=export
+  const step = !docLoaded ? 1 : sigs.signatures.length === 0 ? 2 : !hasSigs ? 3 : 4
+
   return (
     <div className="flex h-screen overflow-hidden bg-gray-100" onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
 
@@ -101,9 +110,18 @@ export default function App() {
       <aside className="w-56 bg-white border-r flex flex-col text-xs">
         <div className="px-3 py-2 border-b font-semibold text-gray-700">Подписи</div>
 
-        {/* Step 1 — toggle bg removal */}
+        {/* Step guide */}
+        <div className="px-3 pt-2 pb-1 border-b">
+          {STEPS.map(({ n, text }) => (
+            <div key={n} className={`flex items-center gap-2 py-0.5 ${step === n ? 'text-blue-600 font-medium' : step > n ? 'text-gray-300 line-through' : 'text-gray-400'}`}>
+              <span className={`w-4 h-4 rounded-full text-center leading-4 flex-shrink-0 text-[10px] ${step === n ? 'bg-blue-600 text-white' : step > n ? 'bg-gray-200 text-gray-400' : 'border border-gray-300 text-gray-400'}`}>{n}</span>
+              <span>{text}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Upload settings */}
         <div className="px-3 pt-2 pb-1">
-          <p className="text-gray-400 mb-1">Шаг 1 — настройки загрузки</p>
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <div
               onClick={() => setRemoveBg(v => !v)}
@@ -115,12 +133,10 @@ export default function App() {
               Удалить фон
             </span>
           </label>
-          {removeBg && <p className="text-gray-400 mt-0.5 ml-10">rembg · ИИ-удаление</p>}
         </div>
 
-        {/* Step 2 — upload */}
+        {/* Upload button */}
         <div className="px-3 pb-2">
-          <p className="text-gray-400 mb-1">Шаг 2 — загрузи подпись</p>
           <button
             onClick={() => sigInputRef.current?.click()}
             disabled={uploading}
@@ -132,12 +148,8 @@ export default function App() {
           {sigError && <p className="text-red-500 mt-1">{sigError}</p>}
         </div>
 
-        <div className="px-3 pb-1 border-t pt-2">
-          <p className="text-gray-400">Шаг 3 — перетащи на документ</p>
-        </div>
-
         {/* Signatures list */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto border-t">
           {sigs.signatures.map((sig) => (
             <div key={sig.id}
               draggable
@@ -168,7 +180,7 @@ export default function App() {
             <input type="file" accept={ALLOWED} onChange={handleFileInput} className="hidden" />
           </label>
 
-          {doc.totalPages > 0 && (
+          {docLoaded && (
             <>
               <span className="text-gray-400 text-xs ml-1">{doc.fileName}</span>
               <div className="flex items-center gap-1 ml-auto">
@@ -179,22 +191,17 @@ export default function App() {
                   className="px-2 py-1 border rounded disabled:opacity-40 hover:bg-gray-100">›</button>
               </div>
               <div className="flex gap-2 ml-4">
-                <button onClick={() => setMode(mode === 'sign' ? 'view' : 'sign')}
-                  className={`px-3 py-1 rounded text-sm ${mode === 'sign' ? 'bg-green-600 text-white' : 'border hover:bg-gray-100'}`}>
-                  {mode === 'sign' ? '✎ Режим подписи' : 'Разместить свою подпись'}
+                <button onClick={undoState.undo} disabled={!undoState.canUndo}
+                  className="px-2 py-1 border rounded text-sm disabled:opacity-40 hover:bg-gray-100">↩ Undo</button>
+                <button onClick={undoState.redo} disabled={!undoState.canRedo}
+                  className="px-2 py-1 border rounded text-sm disabled:opacity-40 hover:bg-gray-100">↪ Redo</button>
+                <button
+                  onClick={handleExport}
+                  disabled={!hasSigs || exporting}
+                  className={`px-3 py-1 rounded text-sm transition-colors ${hasSigs && !exporting ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+                >
+                  {exporting ? 'Экспорт…' : '💾 Вставить и сохранить'}
                 </button>
-                {mode === 'sign' && (
-                  <>
-                    <button onClick={undoState.undo} disabled={!undoState.canUndo}
-                      className="px-2 py-1 border rounded text-sm disabled:opacity-40 hover:bg-gray-100">↩ Undo</button>
-                    <button onClick={undoState.redo} disabled={!undoState.canRedo}
-                      className="px-2 py-1 border rounded text-sm disabled:opacity-40 hover:bg-gray-100">↪ Redo</button>
-                    <button onClick={handleExport} disabled={exporting}
-                      className="px-3 py-1 rounded text-sm bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50">
-                      {exporting ? 'Экспорт…' : '💾 Вставить и сохранить'}
-                    </button>
-                  </>
-                )}
               </div>
             </>
           )}
@@ -216,13 +223,7 @@ export default function App() {
             </div>
           )}
 
-          {!doc.loading && doc.pages[doc.currentPage] && mode === 'view' && (
-            <img src={doc.pages[doc.currentPage]} alt="page"
-              className="shadow-lg bg-white max-w-full"
-              style={{ width: `${doc.scale * 100}%`, height: 'auto' }} />
-          )}
-
-          {!doc.loading && doc.pages[doc.currentPage] && mode === 'sign' && (
+          {!doc.loading && doc.pages[doc.currentPage] && (
             <CanvasEditor
               pageDataUrl={doc.pages[doc.currentPage]}
               pageWidth={794}
