@@ -70,6 +70,8 @@ docker compose up
 
 Открыть в браузере: **http://localhost:8080**
 
+> 🌐 **Живое демо:** [https://tinacodes.space](https://tinacodes.space)
+
 Подписи сохраняются в `./data/signatures/` и не пропадают между перезапусками.
 
 ### Как пользоваться
@@ -150,6 +152,8 @@ docker compose up
 ```
 
 Open in browser: **http://localhost:8080**
+
+> 🌐 **Live demo:** [https://tinacodes.space](https://tinacodes.space)
 
 Signatures are stored in `./data/signatures/` and persist across restarts.
 
