@@ -1,17 +1,53 @@
 name: Release
 
+# A merged PR (push to main) auto-tags v<version> (from package.json) when the
+# version was bumped, then builds a full release: Windows .exe/.msi + GHCR
+# images, published on that tag. Manual `v*` tags trigger the same build.
 on:
   push:
-    tags:
-      - "v*"
+    branches: [main]
+    tags: ["v*"]
 
 permissions:
   contents: write
   packages: write
 
 jobs:
-  # Stable Windows .exe/.msi release (native app + embedded FastAPI sidecar).
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.v.outputs.tag }}
+      do_release: ${{ steps.v.outputs.do_release }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Resolve version / tag
+        id: v
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+            echo "do_release=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          VERSION="$(node -p "require('./frontend/package.json').version")"
+          TAG="v$VERSION"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "Tag $TAG already exists — version not bumped, skipping release."
+            echo "do_release=false" >> "$GITHUB_OUTPUT"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag -a "$TAG" -m "Release $TAG"
+            git push origin "$TAG"
+            echo "do_release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  # Full Windows release (native app + embedded FastAPI sidecar), published on the tag.
   build-tauri:
+    needs: prepare
+    if: needs.prepare.outputs.do_release == 'true'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -52,16 +88,16 @@ jobs:
           python -c "from PIL import Image; Image.new('RGBA',(1024,1024),(37,99,235,255)).save('app-icon.png')"
           npx --yes @tauri-apps/cli@^2 icon app-icon.png
 
-      - name: Build Tauri app
+      - name: Build Tauri app & publish release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VITE_API_BASE: http://localhost:8000
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: PDF Signer ${{ github.ref_name }}
+          tagName: ${{ needs.prepare.outputs.tag }}
+          releaseName: PDF Signer ${{ needs.prepare.outputs.tag }}
           releaseBody: "See CHANGELOG.md for details."
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
 
       - name: Collect artifacts into release/
@@ -78,8 +114,10 @@ jobs:
           name: pdf-signer-windows
           path: release/
 
-  # Publish backend + frontend images to GHCR.
+  # Publish backend + frontend images to GHCR on the same tag.
   build-docker:
+    needs: prepare
+    if: needs.prepare.outputs.do_release == 'true'
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -101,7 +139,7 @@ jobs:
           context: ./backend
           push: true
           tags: |
-            ghcr.io/${{ steps.meta.outputs.owner }}/pdf-signer-backend:${{ github.ref_name }}
+            ghcr.io/${{ steps.meta.outputs.owner }}/pdf-signer-backend:${{ needs.prepare.outputs.tag }}
             ghcr.io/${{ steps.meta.outputs.owner }}/pdf-signer-backend:latest
 
       - name: Build & push frontend image
@@ -110,5 +148,5 @@ jobs:
           context: ./frontend
           push: true
           tags: |
-            ghcr.io/${{ steps.meta.outputs.owner }}/pdf-signer-frontend:${{ github.ref_name }}
+            ghcr.io/${{ steps.meta.outputs.owner }}/pdf-signer-frontend:${{ needs.prepare.outputs.tag }}
             ghcr.io/${{ steps.meta.outputs.owner }}/pdf-signer-frontend:latest

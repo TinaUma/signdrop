@@ -134,9 +134,10 @@ push to main and on pull requests.
   Node). It builds the FastAPI sidecar (PyInstaller from `backend/api_server.spec`),
   places it under the Rust target triple, generates icons, runs `tauri build`, and
   collects the installers (`*-setup.exe`, `*.msi`) into **`./release/`**. In CI,
-  `release-exe.yml` (push to main → prerelease) and `release.yml` (tags →
-  multi-platform release) build the same way and upload the artifacts (also
-  collected into `release/`).
+  `release.yml` builds the full release on **merge to main**: it auto-tags
+  `v<version>` (read from `package.json`, when the version was bumped) and
+  publishes the `.exe`/`.msi` plus the GHCR images on that tag; a manual `v*`
+  tag triggers the same build. Artifacts are also uploaded into `release/`.
 
 ## Internationalization
 

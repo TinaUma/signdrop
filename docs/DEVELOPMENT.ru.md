@@ -134,9 +134,10 @@ push в main и на pull request.
   PyInstaller, Node). Скрипт собирает FastAPI-sidecar (PyInstaller из
   `backend/api_server.spec`), кладёт его под Rust target-triple, генерирует иконки,
   запускает `tauri build` и складывает инсталляторы (`*-setup.exe`, `*.msi`) в
-  **`./release/`**. В CI `release-exe.yml` (push в main → prerelease) и
-  `release.yml` (теги → multi-platform) собирают так же и грузят артефакты (тоже
-  собранные в `release/`).
+  **`./release/`**. В CI `release.yml` собирает полный релиз при **мерже в main**:
+  авто-тег `v<версия>` (из `package.json`, если версия поднята) и публикация
+  `.exe`/`.msi` + образов GHCR на этом теге; ручной тег `v*` запускает ту же
+  сборку. Артефакты также грузятся в `release/`.
 
 ## Интернационализация
 
