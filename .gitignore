@@ -26,6 +26,9 @@ src-tauri/binaries/
 src-tauri/icons/
 app-icon.png
 
+# Collected build output (installers) — produced by scripts/build-exe.sh / CI
+/release/
+
 # OS
 .DS_Store
 Thumbs.db

@@ -76,6 +76,21 @@ jobs:
           prerelease: false
           args: --target ${{ matrix.target }}
 
+      - name: Collect artifacts into release/
+        shell: bash
+        run: |
+          mkdir -p release
+          find src-tauri/target -path "*/release/bundle/*" -type f \
+            \( -name "*.exe" -o -name "*.msi" -o -name "*.dmg" \
+            -o -name "*.AppImage" -o -name "*.deb" \) -exec cp -f {} release/ \; || true
+          ls -la release/ || true
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-signer-${{ matrix.target }}
+          path: release/
+
   build-docker:
     runs-on: ubuntu-22.04
     steps:

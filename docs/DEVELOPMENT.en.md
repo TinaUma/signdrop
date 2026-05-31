@@ -129,10 +129,13 @@ push to main and on pull requests.
 - **Docker** (recommended): `docker compose up` → http://localhost:8080. The
   backend is reached only via the nginx proxy (no host port); containers run
   non-root; `/data` is a named volume.
-- **Native (.exe, experimental)**: `.github/workflows/release-exe.yml` builds the
-  FastAPI sidecar (PyInstaller from `backend/api_server.spec`), generates icons,
-  runs `tauri build` on Windows, and publishes a prerelease on every push to
-  main. Not yet verified end-to-end.
+- **Native (.exe)**: run `scripts/build-exe.sh` (needs Rust, Python + PyInstaller,
+  Node). It builds the FastAPI sidecar (PyInstaller from `backend/api_server.spec`),
+  places it under the Rust target triple, generates icons, runs `tauri build`, and
+  collects the installers (`*-setup.exe`, `*.msi`) into **`./release/`**. In CI,
+  `release-exe.yml` (push to main → prerelease) and `release.yml` (tags →
+  multi-platform release) build the same way and upload the artifacts (also
+  collected into `release/`).
 
 ## Internationalization
 
