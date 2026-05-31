@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
+import { useI18n } from '../i18n/index.jsx'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl
 
@@ -31,6 +32,7 @@ function loadImageDims(url) {
 }
 
 export function useDocument() {
+  const { t } = useI18n()
   const [pages, setPages] = useState([])   // array of data URLs / object URLs
   const [pageDims, setPageDims] = useState([])  // real pixel size {width,height} per page
   const [currentPage, setCurrentPage] = useState(0)
@@ -43,13 +45,13 @@ export function useDocument() {
     setError(null)
 
     if (file.size > MAX_FILE_SIZE) {
-      setError(`Файл слишком большой (${(file.size / 1024 / 1024).toFixed(1)} МБ). Максимум — 50 МБ.`)
+      setError(t('doc.tooBig', { size: (file.size / 1024 / 1024).toFixed(1) }))
       return
     }
 
     const ext = getExt(file.name)
     if (!SUPPORTED_EXTS.has(ext) && !SUPPORTED_TYPES.has(file.type)) {
-      setError(`Неподдерживаемый формат файла: "${ext}". Поддерживаются: PDF, JPG, PNG, TIFF, WEBP.`)
+      setError(t('doc.unsupported', { ext }))
       return
     }
 
@@ -88,11 +90,11 @@ export function useDocument() {
         setPageDims([dim])
       }
     } catch (e) {
-      setError(`Ошибка при открытии файла: ${e.message}`)
+      setError(t('doc.openError', { message: e.message }))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   const goTo = useCallback((n) => {
     setCurrentPage((prev) => Math.max(0, Math.min(n, pages.length - 1)))

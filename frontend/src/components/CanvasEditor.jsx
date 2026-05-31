@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { Stage, Layer, Image as KonvaImage, Transformer } from 'react-konva'
 import { useCanvas } from '../hooks/useCanvas'
+import { useI18n } from '../i18n/index.jsx'
 
 function PageBackground({ dataUrl, width, height }) {
   const [img, setImg] = useState(null)
@@ -70,6 +71,7 @@ function SignatureNode({ layer, isSelected, onSelect, onChange, imageUrl }) {
 }
 
 export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, imageUrl, onLayersChange, onUndo, onRedo, onUndoStateChange }) {
+  const { t } = useI18n()
   const { layers, addSignature, updateLayer, removeLayer, undo, redo, canUndo, canRedo } = useCanvas()
   const [selectedId, setSelectedId] = useState(null)
   const stageRef = useRef(null)
@@ -153,7 +155,7 @@ export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, 
 
       {/* Properties panel */}
       <div className="w-52 bg-white border-l flex flex-col text-xs">
-        <div className="px-3 py-2 border-b font-medium text-gray-700">Свойства</div>
+        <div className="px-3 py-2 border-b font-medium text-gray-700">{t('props.title')}</div>
 
         {selectedLayer ? (
           <div className="px-3 py-2 flex flex-col gap-2">
@@ -166,24 +168,24 @@ export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, 
               </label>
             ))}
             <label className="flex items-center gap-2">
-              <span className="w-8 text-gray-500">Угол</span>
+              <span className="w-8 text-gray-500">{t('props.angle')}</span>
               <input type="number" value={Math.round(selectedLayer.rotation)}
                 onChange={(e) => updateLayer(selectedLayer.id, { rotation: Number(e.target.value) })}
                 className="flex-1 border rounded px-1 py-0.5 w-0" />
             </label>
             <label className="flex flex-col gap-1">
-              <span className="text-gray-500">Прозрачность {Math.round(selectedLayer.opacity * 100)}%</span>
+              <span className="text-gray-500">{t('props.opacity')} {Math.round(selectedLayer.opacity * 100)}%</span>
               <input type="range" min={0} max={100} value={Math.round(selectedLayer.opacity * 100)}
                 onChange={(e) => updateLayer(selectedLayer.id, { opacity: Number(e.target.value) / 100 })}
                 className="w-full" />
             </label>
             <button onClick={() => { removeLayer(selectedLayer.id); setSelectedId(null) }}
               className="mt-2 text-red-500 border border-red-200 rounded py-1 hover:bg-red-50">
-              Удалить
+              {t('props.delete')}
             </button>
           </div>
         ) : (
-          <p className="text-gray-400 px-3 py-3">Выберите подпись</p>
+          <p className="text-gray-400 px-3 py-3">{t('props.selectHint')}</p>
         )}
       </div>
     </div>

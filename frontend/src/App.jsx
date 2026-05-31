@@ -4,6 +4,7 @@ import { useDocument } from './hooks/useDocument'
 import { useSignatures } from './hooks/useSignatures'
 import { CanvasEditor } from './components/CanvasEditor'
 import { LanguageSwitcher } from './i18n/LanguageSwitcher'
+import { useI18n } from './i18n/index.jsx'
 
 const ALLOWED = '.pdf,.jpg,.jpeg,.png,.tiff,.tif,.webp'
 
@@ -17,13 +18,14 @@ const CHECKER = {
 }
 
 const STEPS = [
-  { n: 1, text: 'Открой документ' },
-  { n: 2, text: 'Загрузи подпись' },
-  { n: 3, text: 'Перетащи на документ' },
-  { n: 4, text: 'Нажми «Вставить и сохранить»' },
+  { n: 1, key: 'steps.open' },
+  { n: 2, key: 'steps.upload' },
+  { n: 3, key: 'steps.drag' },
+  { n: 4, key: 'steps.save' },
 ]
 
 export default function App() {
+  const { t } = useI18n()
   const doc = useDocument()
   const sigs = useSignatures()
   const [exporting, setExporting] = useState(false)
@@ -114,14 +116,14 @@ export default function App() {
 
       {/* Left: Signature Library */}
       <aside className="w-56 bg-white border-r flex flex-col text-xs">
-        <div className="px-3 py-2 border-b font-semibold text-gray-700">Подписи</div>
+        <div className="px-3 py-2 border-b font-semibold text-gray-700">{t('app.signaturesTitle')}</div>
 
         {/* Step guide */}
         <div className="px-3 pt-2 pb-1 border-b">
-          {STEPS.map(({ n, text }) => (
+          {STEPS.map(({ n, key }) => (
             <div key={n} className={`flex items-center gap-2 py-0.5 ${step === n ? 'text-blue-600 font-medium' : step > n ? 'text-gray-300 line-through' : 'text-gray-400'}`}>
               <span className={`w-4 h-4 rounded-full text-center leading-4 flex-shrink-0 text-[10px] ${step === n ? 'bg-blue-600 text-white' : step > n ? 'bg-gray-200 text-gray-400' : 'border border-gray-300 text-gray-400'}`}>{n}</span>
-              <span>{text}</span>
+              <span>{t(key)}</span>
             </div>
           ))}
         </div>
@@ -136,7 +138,7 @@ export default function App() {
               <span className={`absolute top-0.5 w-3 h-3 bg-white rounded-full shadow transition-transform ${removeBg ? 'translate-x-4' : 'translate-x-0.5'}`} />
             </div>
             <span className={removeBg ? 'text-blue-600 font-medium' : 'text-gray-400'}>
-              Удалить фон
+              {t('app.removeBg')}
             </span>
           </label>
         </div>
@@ -148,7 +150,7 @@ export default function App() {
             disabled={uploading}
             className="w-full border-2 border-dashed border-gray-300 rounded p-2 text-gray-400 hover:border-blue-400 hover:text-blue-500 transition-colors disabled:opacity-50 text-center"
           >
-            {uploading ? '⏳ Обработка…' : '+ Загрузить подпись'}
+            {uploading ? t('app.processing') : t('app.uploadSignature')}
           </button>
           <input ref={sigInputRef} type="file" accept=".jpg,.jpeg,.png,.tiff,.tif,.webp" onChange={handleSigUpload} className="hidden" />
           {sigError && <p className="text-red-500 mt-1">{sigError}</p>}
@@ -160,7 +162,7 @@ export default function App() {
             <div key={sig.id}
               draggable
               onDragStart={(e) => e.dataTransfer.setData('application/signature', JSON.stringify(sig))}
-              title="Перетащи на документ"
+              title={t('app.dragToDoc')}
               className="flex items-center gap-2 px-2 py-1.5 hover:bg-blue-50 cursor-grab group"
             >
               <div style={CHECKER} className="w-14 h-8 rounded flex-shrink-0 flex items-center justify-center">
@@ -171,7 +173,7 @@ export default function App() {
             </div>
           ))}
           {!sigs.loading && sigs.signatures.length === 0 && (
-            <p className="px-3 py-2 text-gray-400 italic">Нет сохранённых подписей</p>
+            <p className="px-3 py-2 text-gray-400 italic">{t('app.noSignatures')}</p>
           )}
         </div>
       </aside>
@@ -182,7 +184,7 @@ export default function App() {
         {/* Toolbar */}
         <header className="flex items-center gap-2 px-4 py-2 bg-white border-b shadow-sm text-sm flex-shrink-0">
           <label className="cursor-pointer bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 text-sm">
-            Открыть документ
+            {t('app.openDocument')}
             <input type="file" accept={ALLOWED} onChange={handleFileInput} className="hidden" />
           </label>
 
@@ -198,15 +200,15 @@ export default function App() {
               </div>
               <div className="flex gap-2 ml-4">
                 <button onClick={undoState.undo} disabled={!undoState.canUndo}
-                  className="px-2 py-1 border rounded text-sm disabled:opacity-40 hover:bg-gray-100">↩ Undo</button>
+                  className="px-2 py-1 border rounded text-sm disabled:opacity-40 hover:bg-gray-100">↩ {t('app.undo')}</button>
                 <button onClick={undoState.redo} disabled={!undoState.canRedo}
-                  className="px-2 py-1 border rounded text-sm disabled:opacity-40 hover:bg-gray-100">↪ Redo</button>
+                  className="px-2 py-1 border rounded text-sm disabled:opacity-40 hover:bg-gray-100">↪ {t('app.redo')}</button>
                 <button
                   onClick={handleExport}
                   disabled={!hasSigs || exporting}
                   className={`px-3 py-1 rounded text-sm transition-colors ${hasSigs && !exporting ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
                 >
-                  {exporting ? 'Экспорт…' : '💾 Вставить и сохранить'}
+                  {exporting ? t('app.exporting') : `💾 ${t('app.export')}`}
                 </button>
               </div>
             </>
@@ -222,13 +224,13 @@ export default function App() {
 
         {/* Main area */}
         <main className="flex-1 overflow-auto flex items-start justify-center p-6 bg-gray-100">
-          {doc.loading && <p className="text-gray-400 mt-20">Загрузка документа…</p>}
+          {doc.loading && <p className="text-gray-400 mt-20">{t('app.loadingDoc')}</p>}
           {doc.error && <p className="text-red-500 mt-20 max-w-md text-center">{doc.error}</p>}
 
           {!doc.loading && doc.totalPages === 0 && !doc.error && (
             <div className="text-center mt-20 text-gray-400">
-              <p className="text-xl mb-2">Перетащите документ сюда</p>
-              <p className="text-sm">PDF, JPG, PNG, TIFF, WEBP · до 50 МБ</p>
+              <p className="text-xl mb-2">{t('app.dropHere')}</p>
+              <p className="text-sm">{t('app.formatsHint')}</p>
             </div>
           )}
 
