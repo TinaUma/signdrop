@@ -73,7 +73,10 @@ async def export_document(
     file: UploadFile = File(...),
     pages: str = Form(...),
 ):
-    pages_payload = json.loads(pages)
+    try:
+        pages_payload = json.loads(pages)
+    except (json.JSONDecodeError, ValueError):
+        raise HTTPException(status_code=422, detail="Invalid pages payload.")
     data = await file.read()
     if len(data) > pdf_service.MAX_FILE_SIZE:
         raise HTTPException(status_code=413, detail="File exceeds the size limit.")
