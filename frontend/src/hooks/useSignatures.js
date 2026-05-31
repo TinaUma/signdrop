@@ -1,8 +1,10 @@
 import { useState, useCallback, useEffect } from 'react'
+import { useI18n, resolveApiError } from '../i18n/index.jsx'
 
 const API = '/api/signatures'
 
 export function useSignatures() {
+  const { t } = useI18n()
   const [signatures, setSignatures] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -31,12 +33,12 @@ export function useSignatures() {
     form.append('file', file)
     const res = await fetch(`${API}?remove_bg=${removeBg}`, { method: 'POST', body: form })
     if (!res.ok) {
-      const err = await res.json()
-      throw new Error(err.detail || 'Upload failed')
+      const body = await res.json().catch(() => ({}))
+      throw new Error(resolveApiError(body.detail, t))
     }
     await load()
     return res.json()
-  }, [load])
+  }, [load, t])
 
   const remove_ = useCallback(async (id) => {
     await fetch(`${API}/${id}`, { method: 'DELETE' })

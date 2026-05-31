@@ -4,7 +4,7 @@ import { useDocument } from './hooks/useDocument'
 import { useSignatures } from './hooks/useSignatures'
 import { CanvasEditor } from './components/CanvasEditor'
 import { LanguageSwitcher } from './i18n/LanguageSwitcher'
-import { useI18n } from './i18n/index.jsx'
+import { useI18n, resolveApiError } from './i18n/index.jsx'
 
 const ALLOWED = '.pdf,.jpg,.jpeg,.png,.tiff,.tif,.webp'
 
@@ -83,8 +83,8 @@ export default function App() {
 
       const res = await fetch('/api/export', { method: 'POST', body: form })
       if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.detail || 'Export failed')
+        const body = await res.json().catch(() => ({}))
+        throw new Error(resolveApiError(body.detail, t))
       }
 
       const blob = await res.blob()

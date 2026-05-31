@@ -29,4 +29,24 @@ export const ru = {
   'doc.unsupported':
     'Неподдерживаемый формат файла: «{ext}». Поддерживаются: PDF, JPG, PNG, TIFF, WEBP.',
   'doc.openError': 'Ошибка при открытии файла: {message}',
+
+  'error.generic': 'Что-то пошло не так. Попробуйте ещё раз.',
+  'error.invalid_pages_payload': 'Некорректные данные запроса.',
+  'error.file_too_large': 'Файл слишком большой (максимум 50 МБ).',
+  'error.corrupt_pdf': 'Не удалось открыть PDF: файл повреждён или не поддерживается.',
+  'error.corrupt_image': 'Не удалось открыть изображение: файл повреждён или не поддерживается.',
+  'error.page_index_out_of_range': 'Страница вне диапазона документа.',
+  'error.stage_aspect_mismatch': 'Пропорции страницы не совпадают. Откройте документ заново.',
+  'error.invalid_dimensions': 'Некорректные размеры страницы.',
+  'error.stage_dims_required': 'Отсутствуют размеры страницы.',
+  'error.invalid_signature_id': 'Некорректная ссылка на подпись.',
+  'error.coords_out_of_bounds': 'Подпись размещена за пределами страницы.',
+  'error.unsupported_file_type': 'Неподдерживаемый тип файла.',
+  'error.too_many_pages': 'В PDF слишком много страниц.',
+  'error.page_too_large': 'Страница PDF слишком большая для обработки.',
+  'error.image_too_large': 'Изображение слишком большое для обработки.',
+  'error.signature_not_detected':
+    'Подпись не распознана. Используйте более контрастное изображение или отключите удаление фона.',
+  'error.unsupported_signature_format': 'Неподдерживаемый формат подписи.',
+  'error.signature_not_found': 'Подпись не найдена.',
 }

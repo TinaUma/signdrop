@@ -29,4 +29,24 @@ export const en = {
   'doc.unsupported':
     'Unsupported file type: “{ext}”. Supported: PDF, JPG, PNG, TIFF, WEBP.',
   'doc.openError': 'Error opening the file: {message}',
+
+  'error.generic': 'Something went wrong. Please try again.',
+  'error.invalid_pages_payload': 'Invalid request data.',
+  'error.file_too_large': 'The file is too large (max 50 MB).',
+  'error.corrupt_pdf': 'Could not open the PDF: it is corrupt or unsupported.',
+  'error.corrupt_image': 'Could not open the image: it is corrupt or unsupported.',
+  'error.page_index_out_of_range': 'Page is out of range.',
+  'error.stage_aspect_mismatch': 'Page proportions do not match. Please reopen the document.',
+  'error.invalid_dimensions': 'Invalid page dimensions.',
+  'error.stage_dims_required': 'Missing page dimensions.',
+  'error.invalid_signature_id': 'Invalid signature reference.',
+  'error.coords_out_of_bounds': 'A signature is placed outside the page.',
+  'error.unsupported_file_type': 'Unsupported file type.',
+  'error.too_many_pages': 'The PDF has too many pages.',
+  'error.page_too_large': 'A PDF page is too large to process.',
+  'error.image_too_large': 'The image is too large to process.',
+  'error.signature_not_detected':
+    'No signature detected. Use a clearer image or turn off background removal.',
+  'error.unsupported_signature_format': 'Unsupported signature format.',
+  'error.signature_not_found': 'Signature not found.',
 }

@@ -52,3 +52,18 @@ export function useI18n() {
   if (!ctx) throw new Error('useI18n must be used within an I18nProvider')
   return ctx
 }
+
+// Turn an API error `detail` into a user-facing string. ApiError sends
+// {code, message}; map the code to a localized `error.<code>` string, falling
+// back to the English message, then the generic error. Plain-string details and
+// FastAPI validation lists are handled too.
+export function resolveApiError(detail, t) {
+  if (detail && typeof detail === 'object' && !Array.isArray(detail) && detail.code) {
+    const key = `error.${detail.code}`
+    const localized = t(key)
+    if (localized !== key) return localized
+    return detail.message || t('error.generic')
+  }
+  if (typeof detail === 'string') return detail
+  return t('error.generic')
+}
