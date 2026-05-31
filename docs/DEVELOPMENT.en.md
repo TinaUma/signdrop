@@ -77,7 +77,7 @@ Errors: `invalid_pages_payload`, `file_too_large` (413), `corrupt_pdf`,
 `corrupt_image`, `page_index_out_of_range`, `stage_aspect_mismatch`,
 `invalid_dimensions`, `stage_dims_required`, `invalid_signature_id`,
 `coords_out_of_bounds`, `unsupported_file_type`, `too_many_pages`,
-`page_too_large`, `image_too_large` (all 422).
+`page_too_large`, `image_too_large`, `no_pages_left` (all 422).
 
 ### `GET /health`
 Returns `{ "status": "ok", "service": "pdf-signer-api" }`.
@@ -118,10 +118,11 @@ pip install -r backend/requirements.txt pytest httpx
 python -m pytest                   # backend (pytest.ini sets pythonpath=backend)
 
 cd frontend && npm run lint        # ESLint flat config
+cd frontend && npm test            # Vitest (hooks, i18n)
 cd frontend && npm run build       # production build
 ```
 
-CI (`.github/workflows/ci.yml`) runs backend pytest and frontend lint/build on
+CI (`.github/workflows/ci.yml`) runs backend pytest and frontend lint, test, build on
 push to main and on pull requests.
 
 ## Deployment

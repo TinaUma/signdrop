@@ -35,8 +35,11 @@
 - Холст использует реальные размеры страницы вместо фиксированного A4.
 - Image-экспорт сохраняет формат источника (PNG/JPEG/TIFF/WEBP).
 - Харденинг Docker: бэкенд без host-порта (только через nginx), non-root
-  контейнеры, named volume для `/data`, security-заголовки nginx, CSP без
-  `unsafe-inline`.
+  контейнеры, named volume для `/data`, security-заголовки nginx
+  (X-Content-Type-Options/X-Frame-Options/Referrer-Policy); CSP в Tauri без
+  `unsafe-inline` в script-src.
+- CORS ограничен известными origin (вместо `*`).
+- Имена выходных файлов с uuid-суффиксом (нет коллизий при экспорте в одну секунду).
 
 #### Fixed (Исправлено)
 - Экспорт PDF проверял координаты против неверной единицы (`page.rect*2`);
@@ -91,8 +94,11 @@
 - The editor canvas uses each document's real dimensions instead of a fixed A4.
 - Image export preserves the source format (PNG/JPEG/TIFF/WEBP).
 - Docker deployment hardened: no backend host port (nginx proxy only), non-root
-  containers, named `/data` volume, nginx security headers, CSP without
-  `unsafe-inline`.
+  containers, named `/data` volume, nginx security headers
+  (X-Content-Type-Options/X-Frame-Options/Referrer-Policy); the Tauri CSP drops
+  `unsafe-inline` from script-src.
+- CORS restricted to known origins (instead of `*`).
+- Output filenames get a uuid suffix (no same-second collisions).
 
 #### Fixed
 - PDF export validated coordinates against the wrong unit (`page.rect*2`); now

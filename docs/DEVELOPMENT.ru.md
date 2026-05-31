@@ -76,7 +76,7 @@ Form: `file`; `pages` (JSON); `delete_pages` (JSON-список индексов
 `corrupt_image`, `page_index_out_of_range`, `stage_aspect_mismatch`,
 `invalid_dimensions`, `stage_dims_required`, `invalid_signature_id`,
 `coords_out_of_bounds`, `unsupported_file_type`, `too_many_pages`,
-`page_too_large`, `image_too_large` (все 422).
+`page_too_large`, `image_too_large`, `no_pages_left` (все 422).
 
 ### `GET /health`
 Возвращает `{ "status": "ok", "service": "pdf-signer-api" }`.
@@ -118,10 +118,11 @@ pip install -r backend/requirements.txt pytest httpx
 python -m pytest                   # бэкенд (pytest.ini задаёт pythonpath=backend)
 
 cd frontend && npm run lint        # ESLint flat config
+cd frontend && npm test            # Vitest (хуки, i18n)
 cd frontend && npm run build       # прод-сборка
 ```
 
-CI (`.github/workflows/ci.yml`) гоняет backend pytest и frontend lint/build на
+CI (`.github/workflows/ci.yml`) гоняет backend pytest и frontend lint, test, build на
 push в main и на pull request.
 
 ## Деплой

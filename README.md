@@ -5,7 +5,7 @@
 **Инструмент для наложения рукописной подписи на документы**  
 **A tool for placing handwritten signatures on documents**
 
-[![Status](https://img.shields.io/badge/version-1.1-brightgreen)](https://github.com/TinaUma/PDF_Signer)
+[![Status](https://img.shields.io/badge/version-1.1.0-brightgreen)](https://github.com/TinaUma/PDF_Signer)
 [![Python](https://img.shields.io/badge/python-3.11-blue?logo=python&logoColor=white)](https://python.org)
 [![React](https://img.shields.io/badge/react-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
@@ -83,7 +83,7 @@ docker compose up
 
 ### Как пользоваться
 
-1. **Загрузи подпись** — левая панель → «+ Загрузить подпись» (JPG, PNG)  
+1. **Загрузи подпись** — левая панель → «+ Загрузить подпись» (JPG, PNG, TIFF, WEBP)  
    Фон удалится автоматически, можно отключить тумблером
 2. **Открой документ** — кнопка «Открыть документ» или перетащи файл
 3. **Перетащи** подпись из библиотеки на документ
@@ -173,7 +173,7 @@ Signatures are stored in `./data/signatures/` and persist across restarts.
 
 ### How to use
 
-1. **Upload your signature** — left panel → "+ Upload signature" (JPG, PNG)  
+1. **Upload your signature** — left panel → "+ Upload signature" (JPG, PNG, TIFF, WEBP)  
    Background is removed automatically; toggle to disable
 2. **Open a document** — click "Open document" or drag & drop a file
 3. **Drag** a signature from the library onto the document
