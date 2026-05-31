@@ -2,14 +2,12 @@
 # Run: pyinstaller api_server.spec
 # Output: dist/api-server (or dist/api-server.exe on Windows)
 
-import sys
-from pathlib import Path
-
 block_cipher = None
 
+# SPECPATH is injected by PyInstaller and is the directory of this spec file.
 a = Analysis(
     ['main.py'],
-    pathex=[str(Path(__file__).parent)],
+    pathex=[SPECPATH],
     binaries=[],
     datas=[],
     hiddenimports=[

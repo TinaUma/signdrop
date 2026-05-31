@@ -17,7 +17,9 @@ path = "src/main.rs"
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = ["shell-sidecar"] }
+# Sidecar support in Tauri v2 comes from the tauri-plugin-shell plugin + a
+# capability (see capabilities/default.json), not a `tauri` feature.
+tauri = { version = "2", features = [] }
 tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
