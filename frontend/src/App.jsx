@@ -6,6 +6,7 @@ import { CanvasEditor } from './components/CanvasEditor'
 import { LanguageSwitcher } from './i18n/LanguageSwitcher'
 import { useI18n, resolveApiError } from './i18n/index.jsx'
 import { FALLBACK_DIMS, API_BASE } from './constants'
+import { buildExportPayload, signAllPages } from './lib/exportPayload'
 
 const ALLOWED = '.pdf,.jpg,.jpeg,.png,.tiff,.tif,.webp'
 
@@ -93,16 +94,11 @@ export default function App() {
     recomputeHasSigs(deletedPages)
   }, [doc.currentPage, deletedPages])
 
-  // Copy the current page's signatures onto every page.
+  // Copy the current page's signatures onto every (non-deleted) page.
   const handleSignAll = () => {
     const cur = layersByPageRef.current[doc.currentPage] || []
     if (cur.length === 0) return
-    for (let i = 0; i < doc.totalPages; i++) {
-      if (deletedPages.has(i)) continue  // don't sign pages excluded from export
-      // Unique id per (page, layer index) — avoids duplicate React keys when the
-      // same signature appears more than once.
-      layersByPageRef.current[i] = cur.map((l, j) => ({ ...l, id: `${l.sigId}-p${i}-${j}` }))
-    }
+    Object.assign(layersByPageRef.current, signAllPages(cur, doc.totalPages, deletedPages))
     setHasSigs(true)
     setEditorKey((k) => k + 1)
   }
@@ -117,23 +113,12 @@ export default function App() {
     setExporting(true)
     setExportError(null)
     try {
-      const byPage = layersByPageRef.current
-      const pagesPayload = Object.keys(byPage)
-        .map(Number)
-        .filter((idx) => byPage[idx] && byPage[idx].length > 0 && !deletedPages.has(idx))
-        .map((idx) => {
-          const dims = doc.pageDims[idx] || FALLBACK_DIMS
-          return {
-            page_idx: idx,
-            stage_w: dims.width,
-            stage_h: dims.height,
-            jitter: jitter / 100,
-            signatures: byPage[idx].map((l) => ({
-              id: l.sigId, x: l.x, y: l.y, w: l.width, h: l.height,
-              angle: l.rotation, opacity: l.opacity,
-            })),
-          }
-        })
+      const pagesPayload = buildExportPayload({
+        layersByPage: layersByPageRef.current,
+        pageDims: doc.pageDims,
+        deletedPages,
+        jitter,
+      })
       if (pagesPayload.length === 0 && deletedPages.size === 0) return
 
       const form = new FormData()

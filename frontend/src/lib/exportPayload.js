@@ -1,0 +1,40 @@
+import { FALLBACK_DIMS } from '../constants'
+
+// Build the /api/export `pages` payload from the per-page layer map. Only pages
+// that have signatures AND are not marked for deletion are included; each uses
+// its own real dimensions (so the backend's sx == sy).
+export function buildExportPayload({ layersByPage, pageDims, deletedPages, jitter }) {
+  return Object.keys(layersByPage)
+    .map(Number)
+    .filter((idx) => layersByPage[idx]?.length > 0 && !deletedPages.has(idx))
+    .map((idx) => {
+      const dims = pageDims[idx] || FALLBACK_DIMS
+      return {
+        page_idx: idx,
+        stage_w: dims.width,
+        stage_h: dims.height,
+        jitter: jitter / 100,
+        signatures: layersByPage[idx].map((l) => ({
+          id: l.sigId,
+          x: l.x,
+          y: l.y,
+          w: l.width,
+          h: l.height,
+          angle: l.rotation,
+          opacity: l.opacity,
+        })),
+      }
+    })
+}
+
+// Copy the given layers onto every non-deleted page, giving each layer a unique
+// id per (page, index) so React keys don't collide. Returns a {pageIdx: layers}
+// map to merge into the per-page store.
+export function signAllPages(layers, totalPages, deletedPages) {
+  const out = {}
+  for (let i = 0; i < totalPages; i++) {
+    if (deletedPages.has(i)) continue
+    out[i] = layers.map((l, j) => ({ ...l, id: `${l.sigId}-p${i}-${j}` }))
+  }
+  return out
+}
