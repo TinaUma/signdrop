@@ -24,6 +24,7 @@ def export_pdf(pdf_data: bytes, pages_payload: list[dict]) -> bytes:
         p["page_idx"]: (p.get("stage_w", 794), p.get("stage_h", 1123))
         for p in pages_payload
     }
+    jitter_map = {p["page_idx"]: p.get("jitter", 0) for p in pages_payload}
 
     for i, page in enumerate(src):
         if i in page_map and page_map[i]:
@@ -42,7 +43,9 @@ def export_pdf(pdf_data: bytes, pages_payload: list[dict]) -> bytes:
                 }
                 for s in page_map[i]
             ]
-            composed = compose_page(img, scaled_sigs, sig_dir)
+            composed = compose_page(
+                img, scaled_sigs, sig_dir, jitter=jitter_map.get(i, 0)
+            )
 
             buf = io.BytesIO()
             composed.convert("RGB").save(buf, format="PNG")

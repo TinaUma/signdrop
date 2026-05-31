@@ -31,6 +31,7 @@ export default function App() {
   const [exporting, setExporting] = useState(false)
   const [exportError, setExportError] = useState(null)
   const [removeBg, setRemoveBg] = useState(true)
+  const [jitter, setJitter] = useState(0)  // 0..100 — signature uniquification
   const [uploading, setUploading] = useState(false)
   const [sigError, setSigError] = useState(null)
   const [hasSigs, setHasSigs] = useState(false)
@@ -72,7 +73,7 @@ export default function App() {
     setExportError(null)
     try {
       const layers = canvasLayersRef.current
-      const pagesPayload = [{ page_idx: doc.currentPage, stage_w: pageDims.width, stage_h: pageDims.height, signatures: layers.map((l) => ({
+      const pagesPayload = [{ page_idx: doc.currentPage, stage_w: pageDims.width, stage_h: pageDims.height, jitter: jitter / 100, signatures: layers.map((l) => ({
           id: l.sigId, x: l.x, y: l.y, w: l.width, h: l.height,
           angle: l.rotation, opacity: l.opacity,
         })) }]
@@ -140,6 +141,15 @@ export default function App() {
             <span className={removeBg ? 'text-blue-600 font-medium' : 'text-gray-400'}>
               {t('app.removeBg')}
             </span>
+          </label>
+
+          <label className="flex flex-col gap-0.5 mt-2" title={t('app.uniquifyHint')}>
+            <span className={jitter > 0 ? 'text-blue-600 font-medium' : 'text-gray-400'}>
+              {t('app.uniquify')} {jitter > 0 ? `${jitter}%` : ''}
+            </span>
+            <input type="range" min={0} max={100} value={jitter}
+              onChange={(e) => setJitter(Number(e.target.value))}
+              className="w-full" />
           </label>
         </div>
 

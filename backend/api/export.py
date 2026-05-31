@@ -165,7 +165,9 @@ async def export_document(
             for s in sigs
         ]
         _validate_signatures(scaled_sigs, img.width, img.height)
-        composed = compose_page(img, scaled_sigs, get_signatures_dir())
+        composed = compose_page(
+            img, scaled_sigs, get_signatures_dir(), jitter=page_info.get("jitter", 0)
+        )
         fmt, media_type, out_ext = IMAGE_OUTPUT[ext]
         buf = io.BytesIO()
         composed.convert("RGB").save(buf, format=fmt)

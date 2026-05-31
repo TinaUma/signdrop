@@ -1,6 +1,8 @@
 export const en = {
   'app.signaturesTitle': 'Signatures',
   'app.removeBg': 'Remove background',
+  'app.uniquify': 'Uniquify signature',
+  'app.uniquifyHint': 'Slight per-placement variation',
   'app.uploadSignature': '+ Upload signature',
   'app.processing': '⏳ Processing…',
   'app.noSignatures': 'No saved signatures',

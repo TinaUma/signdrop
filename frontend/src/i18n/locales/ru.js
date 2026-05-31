@@ -1,6 +1,8 @@
 export const ru = {
   'app.signaturesTitle': 'Подписи',
   'app.removeBg': 'Удалить фон',
+  'app.uniquify': 'Уникализация подписи',
+  'app.uniquifyHint': 'Лёгкие отличия каждой подписи',
   'app.uploadSignature': '+ Загрузить подпись',
   'app.processing': '⏳ Обработка…',
   'app.noSignatures': 'Нет сохранённых подписей',
