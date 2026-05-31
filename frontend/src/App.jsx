@@ -3,6 +3,7 @@ import './index.css'
 import { useDocument } from './hooks/useDocument'
 import { useSignatures } from './hooks/useSignatures'
 import { CanvasEditor } from './components/CanvasEditor'
+import { LanguageSwitcher } from './i18n/LanguageSwitcher'
 
 const ALLOWED = '.pdf,.jpg,.jpeg,.png,.tiff,.tif,.webp'
 
@@ -210,6 +211,9 @@ export default function App() {
               </div>
             </>
           )}
+          <div className={docLoaded ? 'ml-2' : 'ml-auto'}>
+            <LanguageSwitcher />
+          </div>
         </header>
 
         {exportError && (
