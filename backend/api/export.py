@@ -47,10 +47,14 @@ async def export_document(
                     raise HTTPException(
                         status_code=422, detail=f"Page index {idx} out of range"
                     )
-                page = doc[idx]
-                _validate_signatures(
-                    p["signatures"], page.rect.width * 2, page.rect.height * 2
-                )
+                # Signatures arrive in the frontend stage coordinate space
+                # (stage_w x stage_h, default 794x1123). pdf_writer scales from
+                # that same space, so bounds must be checked against it — NOT
+                # against page.rect (a different unit) which produced both false
+                # rejections (small pages) and false passes (large pages).
+                stage_w = p.get("stage_w", 794)
+                stage_h = p.get("stage_h", 1123)
+                _validate_signatures(p["signatures"], stage_w, stage_h)
             doc.close()
         except HTTPException:
             raise
