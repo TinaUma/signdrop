@@ -8,7 +8,7 @@ from PIL import Image
 
 from constants import STAGE_FALLBACK_H, STAGE_FALLBACK_W
 from services.composer import compose_page
-from services.pdf_service import ensure_render_safe
+from services.pdf_service import ensure_render_safe, RENDER_DPI
 from services.signature_service import get_signatures_dir
 
 
@@ -45,7 +45,7 @@ def _build_pdf(src, out, pages_payload, delete_set) -> bytes:
         if i in delete_set:
             continue  # page removed from the exported document
         if i in page_map and page_map[i]:
-            pix = page.get_pixmap(dpi=200)
+            pix = page.get_pixmap(dpi=RENDER_DPI)
             img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
             stage_w, stage_h = stage_map.get(i, (STAGE_FALLBACK_W, STAGE_FALLBACK_H))
             sx = pix.width / stage_w

@@ -50,9 +50,6 @@ jobs:
         run: |
           pip install -r backend/requirements.txt pyinstaller
 
-      - name: Pre-download rembg model
-        run: python -c "from rembg import new_session; new_session('u2net')"
-
       - name: Build Python sidecar
         run: |
           cd backend
@@ -61,12 +58,14 @@ jobs:
           cp dist/api-server* ../src-tauri/binaries/
 
       - name: Install frontend dependencies
-        run: npm ci --prefix frontend
+        run: npm install --prefix frontend
 
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Tauri webview can't reach the sidecar via a relative /api path.
+          VITE_API_BASE: http://localhost:8000
         with:
           projectPath: .
           tagName: ${{ github.ref_name }}

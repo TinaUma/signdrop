@@ -16,6 +16,9 @@ SIGNATURES_DIR = DATA_DIR / "signatures"
 
 SUPPORTED_EXTS = {".jpg", ".jpeg", ".png", ".tiff", ".tif", ".webp"}
 
+# Ink/paper separation knob: keep pixels darker than the paper by this much.
+DARKNESS_THRESHOLD = 35
+
 _UUID_RE = re.compile(
     r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
     r"[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
@@ -32,7 +35,9 @@ def is_valid_sig_id(sig_id) -> bool:
     return isinstance(sig_id, str) and bool(_UUID_RE.match(sig_id))
 
 
-def _remove_bg_adaptive(img: Image.Image, darkness_threshold: int = 35) -> Image.Image:
+def _remove_bg_adaptive(
+    img: Image.Image, darkness_threshold: int = DARKNESS_THRESHOLD
+) -> Image.Image:
     """Remove background from a signature image.
 
     Estimates paper luminance from corner pixels, then keeps only pixels that are
