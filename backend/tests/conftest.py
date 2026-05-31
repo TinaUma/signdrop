@@ -1,22 +1,22 @@
 """Shared pytest fixtures for the PDF Signer backend.
 
 DATA_DIR side effects are redirected to a per-test tmp directory so tests never
-touch the real ./data volume. `signature_service` binds SIGNATURES_DIR at import
-time, while `pdf_writer.save_output` re-reads os.environ per call — both are
-covered below.
+touch the real ./data volume. Both get_signatures_dir() and pdf_writer.save_output
+resolve the path via constants.get_data_dir() at call time, so setting the
+DATA_DIR env var alone is enough.
 """
 
 import fitz
 import pytest
 from fastapi.testclient import TestClient
 
-import services.signature_service as sigsvc
 from main import app
 
 
 @pytest.fixture(autouse=True)
 def _tmp_data_dir(tmp_path, monkeypatch):
-    monkeypatch.setattr(sigsvc, "SIGNATURES_DIR", tmp_path / "signatures")
+    # get_data_dir() (and thus get_signatures_dir / save_output) reads DATA_DIR
+    # at call time, so the env var alone redirects all data writes to tmp.
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     yield
 

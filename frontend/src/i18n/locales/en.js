@@ -23,6 +23,12 @@ export const en = {
   'app.dropHere': 'Drop a document here',
   'app.formatsHint': 'PDF, JPG, PNG, TIFF, WEBP · up to 50 MB',
 
+  'backend.title': 'Service failed to start',
+  'backend.message':
+    'Could not reach the local processing service. Wait a moment and try again.',
+  'backend.retry': 'Retry',
+  'backend.retrying': '⏳ Connecting…',
+
   'steps.open': 'Open a document',
   'steps.upload': 'Upload a signature',
   'steps.drag': 'Drag it onto the document',

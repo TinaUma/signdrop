@@ -1,5 +1,6 @@
 import io
 import json
+import logging
 from pathlib import Path
 
 from fastapi import APIRouter, UploadFile, File, Form
@@ -14,6 +15,19 @@ from services.composer import compose_page
 from services.signature_service import get_signatures_dir, is_valid_sig_id
 
 router = APIRouter(prefix="/api/export", tags=["export"])
+
+logger = logging.getLogger(__name__)
+
+
+def _persist_copy(data: bytes, ext: str) -> None:
+    """Save a server-side copy of the export (audit trail). Best-effort: a
+    disk-full or permission error must never block the user's download — the
+    signed bytes are already in hand, so log and return them regardless."""
+    try:
+        save_output(data, ext)
+    except OSError as e:
+        logger.warning("Could not save server-side export copy: %s", e)
+
 
 # Map source extension -> (PIL format, response media type, output extension).
 # Lets image export preserve the source format instead of always emitting JPEG.
@@ -64,6 +78,10 @@ def _validate_payload_shape(pages_payload):
     can't raise KeyError/TypeError (which would surface as 500). Returns 422."""
     if not isinstance(pages_payload, list):
         raise ApiError("invalid_pages_payload", "Invalid pages payload.")
+    # Count limits BEFORE per-item iteration — bounds the O(n·m) work an
+    # attacker can trigger with a single unauthenticated request.
+    if len(pages_payload) > pdf_service.MAX_PAGES:
+        raise ApiError("invalid_pages_payload", "Too many pages in payload.")
     for p in pages_payload:
         if (
             not isinstance(p, dict)
@@ -72,13 +90,25 @@ def _validate_payload_shape(pages_payload):
             or p["page_idx"] < 0
         ):
             raise ApiError("invalid_pages_payload", "Invalid pages payload.")
+        # stage_w/stage_h, when present, feed division in _check_aspect and the
+        # export scaling — a non-numeric or non-positive value would raise an
+        # unhandled TypeError/ZeroDivision (HTTP 500). Reject as 422 up front.
+        for key in ("stage_w", "stage_h"):
+            if key in p and not (_is_number(p[key]) and p[key] > 0):
+                raise ApiError("invalid_pages_payload", "Invalid pages payload.")
         sigs = p.get("signatures", [])
         if not isinstance(sigs, list):
             raise ApiError("invalid_pages_payload", "Invalid pages payload.")
+        if len(sigs) > pdf_service.MAX_SIGS_PER_PAGE:
+            raise ApiError("invalid_pages_payload", "Too many signatures on a page.")
         for s in sigs:
             if not isinstance(s, dict) or not all(
                 _is_number(s.get(k)) for k in ("x", "y", "w", "h")
             ):
+                raise ApiError("invalid_pages_payload", "Invalid pages payload.")
+            # Non-positive w/h would otherwise be silently clamped to 1px in the
+            # composer (a placement the user never asked for); reject explicitly.
+            if s["w"] <= 0 or s["h"] <= 0:
                 raise ApiError("invalid_pages_payload", "Invalid pages payload.")
 
 
@@ -103,6 +133,10 @@ async def export_document(
     pages: str = Form(...),
     delete_pages: str = Form("[]"),
 ):
+    # Cap the raw body before parsing — a huge `pages` string is a cheap,
+    # unauthenticated DoS vector (O(n) parse + O(n·m) validation otherwise).
+    if len(pages) > pdf_service.MAX_PAGES_JSON_BYTES:
+        raise ApiError("invalid_pages_payload", "Pages payload too large.", 413)
     try:
         pages_payload = json.loads(pages)
         delete_list = json.loads(delete_pages)
@@ -161,7 +195,7 @@ async def export_document(
             doc.close()
 
         result_bytes = export_pdf(data, pages_payload, delete_pages=delete_list)
-        save_output(result_bytes, "pdf")
+        _persist_copy(result_bytes, "pdf")
         return Response(
             content=result_bytes,
             media_type="application/pdf",
@@ -218,7 +252,7 @@ async def export_document(
         buf = io.BytesIO()
         composed.convert("RGB").save(buf, format=fmt)
         result_bytes = buf.getvalue()
-        save_output(result_bytes, out_ext.lstrip("."))
+        _persist_copy(result_bytes, out_ext.lstrip("."))
         return Response(
             content=result_bytes,
             media_type=media_type,

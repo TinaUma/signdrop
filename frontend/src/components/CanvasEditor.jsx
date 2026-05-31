@@ -104,7 +104,14 @@ export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, 
     e.stopPropagation()  // prevent bubbling to App's file-drop handler
     const data = e.dataTransfer.getData('application/signature')
     if (!data) return
-    const sig = JSON.parse(data)
+    // A foreign/garbled drag can carry our MIME type with non-JSON data; an
+    // unguarded parse would throw out of the event handler. Ignore bad payloads.
+    let sig
+    try {
+      sig = JSON.parse(data)
+    } catch {
+      return
+    }
     const stage = stageRef.current
     if (!stage) return
     const rect = stage.container().getBoundingClientRect()

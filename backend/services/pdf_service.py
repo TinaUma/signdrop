@@ -12,6 +12,11 @@ SUPPORTED_IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".tiff", ".tif", ".webp"}
 SUPPORTED_PDF_EXTS = {".pdf"}
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
 MAX_PAGES = 500  # reject absurd page counts (DoS)
+MAX_SIGS_PER_PAGE = 100  # reject absurd signature counts per page (DoS)
+# Cap raw `pages` JSON before parsing (DoS). Kept under Starlette's ~1MB
+# multipart part limit so this explicit 413 fires first; legit payloads (a few
+# pages × a few signatures) are a few KB.
+MAX_PAGES_JSON_BYTES = 512 * 1024
 RENDER_DPI = 200
 MAX_PIXMAP_PIXELS = 64_000_000  # ~8000x8000 — cap rasterised page area (bomb)
 

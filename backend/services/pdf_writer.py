@@ -1,5 +1,4 @@
 import io
-import os
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -7,7 +6,7 @@ from pathlib import Path
 import fitz
 from PIL import Image
 
-from constants import STAGE_FALLBACK_H, STAGE_FALLBACK_W
+from constants import STAGE_FALLBACK_H, STAGE_FALLBACK_W, get_data_dir
 from services.composer import compose_page
 from services.pdf_service import ensure_render_safe, RENDER_DPI
 from services.signature_service import get_signatures_dir
@@ -78,7 +77,7 @@ def _build_pdf(src, out, pages_payload, delete_set) -> bytes:
 
 
 def save_output(data: bytes, ext: str = "pdf") -> Path:
-    data_dir = Path(os.environ.get("DATA_DIR", "./data")) / "output"
+    data_dir = get_data_dir() / "output"
     data_dir.mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     # uuid suffix avoids collisions/overwrites for exports within the same second.

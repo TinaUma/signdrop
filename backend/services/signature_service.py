@@ -1,5 +1,4 @@
 import io
-import os
 import re
 import uuid
 from pathlib import Path
@@ -7,12 +6,10 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+from constants import get_data_dir
 from errors import DomainError
 from services.pdf_service import ensure_image_safe
 
-
-DATA_DIR = Path(os.environ.get("DATA_DIR", "./data"))
-SIGNATURES_DIR = DATA_DIR / "signatures"
 
 SUPPORTED_EXTS = {".jpg", ".jpeg", ".png", ".tiff", ".tif", ".webp"}
 
@@ -86,8 +83,12 @@ def _remove_bg_adaptive(
 
 
 def get_signatures_dir() -> Path:
-    SIGNATURES_DIR.mkdir(parents=True, exist_ok=True)
-    return SIGNATURES_DIR
+    # Computed at call time (not bound at import) so a DATA_DIR set after import
+    # — Docker, tests, the Tauri host's app_data_dir — always takes effect.
+    # Symmetric with pdf_writer.save_output.
+    d = get_data_dir() / "signatures"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
 
 
 def list_signatures() -> list[dict]:

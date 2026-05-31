@@ -23,6 +23,12 @@ export const ru = {
   'app.dropHere': 'Перетащите документ сюда',
   'app.formatsHint': 'PDF, JPG, PNG, TIFF, WEBP · до 50 МБ',
 
+  'backend.title': 'Сервис не запустился',
+  'backend.message':
+    'Не удалось подключиться к локальному сервису обработки. Подождите немного и попробуйте снова.',
+  'backend.retry': 'Повторить',
+  'backend.retrying': '⏳ Подключение…',
+
   'steps.open': 'Открой документ',
   'steps.upload': 'Загрузи подпись',
   'steps.drag': 'Перетащи на документ',

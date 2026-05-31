@@ -65,10 +65,6 @@ def compose_page(
         h = max(1, round(int(sig["h"]) * scale_mult))
         sig_img = sig_img.resize((w, h), Image.LANCZOS)
 
-        angle = sig.get("angle", 0) + d_angle
-        if angle:
-            sig_img = sig_img.rotate(-angle, expand=True, resample=Image.BICUBIC)
-
         opacity = max(0.0, min(1.0, sig.get("opacity", 1.0) * opacity_mult))
         if opacity < 1.0:
             r, g, b, a = sig_img.split()
@@ -77,6 +73,22 @@ def compose_page(
 
         x = int(sig["x"]) + dx
         y = int(sig["y"]) + dy
-        result.paste(sig_img, (x, y), sig_img)
+
+        angle = sig.get("angle", 0) + d_angle
+        if angle:
+            # Konva rotates the layer about its top-left corner at (x, y) —
+            # offsetX/Y are 0 (CanvasEditor KonvaImage). Replicate that pivot:
+            # centre the corner in a padded canvas, so rotating about the canvas
+            # centre == rotating about the corner, then paste so the corner
+            # returns to (x, y). PIL's plain centre-pivot rotate shifted rotated
+            # signatures ~14-22px off from where the user placed them.
+            canvas = Image.new("RGBA", (w * 2, h * 2), (0, 0, 0, 0))
+            canvas.paste(sig_img, (w, h))
+            canvas = canvas.rotate(-angle, expand=True, resample=Image.BICUBIC)
+            ox = round(x - canvas.width / 2)
+            oy = round(y - canvas.height / 2)
+            result.paste(canvas, (ox, oy), canvas)
+        else:
+            result.paste(sig_img, (x, y), sig_img)
 
     return result

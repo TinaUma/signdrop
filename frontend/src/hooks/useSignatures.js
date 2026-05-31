@@ -1,8 +1,10 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useI18n, resolveApiError } from '../i18n/index.jsx'
-import { API_BASE } from '../constants'
+import { getApiBase } from '../constants'
 
-const API = `${API_BASE}/api/signatures`
+// Built at request time, not module-load: the Tauri API base is only known
+// after resolveApiBase() runs (dynamic sidecar port).
+const api = () => `${getApiBase()}/api/signatures`
 
 export function useSignatures() {
   const { t } = useI18n()
@@ -11,7 +13,7 @@ export function useSignatures() {
   const [error, setError] = useState(null)
 
   const fetch_ = useCallback(async () => {
-    const res = await fetch(API)
+    const res = await fetch(api())
     if (!res.ok) throw new Error(t('error.load_signatures_failed'))
     return res.json()
   }, [t])
@@ -32,7 +34,7 @@ export function useSignatures() {
   const upload = useCallback(async (file, removeBg = true) => {
     const form = new FormData()
     form.append('file', file)
-    const res = await fetch(`${API}?remove_bg=${removeBg}`, { method: 'POST', body: form })
+    const res = await fetch(`${api()}?remove_bg=${removeBg}`, { method: 'POST', body: form })
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
       throw new Error(resolveApiError(body.detail, t))
@@ -42,11 +44,11 @@ export function useSignatures() {
   }, [load, t])
 
   const remove_ = useCallback(async (id) => {
-    await fetch(`${API}/${id}`, { method: 'DELETE' })
+    await fetch(`${api()}/${id}`, { method: 'DELETE' })
     await load()
   }, [load])
 
-  const imageUrl = (id) => `${API}/${id}/image`
+  const imageUrl = (id) => `${api()}/${id}/image`
 
   return { signatures, loading, error, upload, remove: remove_, imageUrl, reload: load }
 }

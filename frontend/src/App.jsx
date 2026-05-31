@@ -5,7 +5,7 @@ import { useSignatures } from './hooks/useSignatures'
 import { CanvasEditor } from './components/CanvasEditor'
 import { LanguageSwitcher } from './i18n/LanguageSwitcher'
 import { useI18n, resolveApiError } from './i18n/index.jsx'
-import { FALLBACK_DIMS, API_BASE } from './constants'
+import { FALLBACK_DIMS, getApiBase } from './constants'
 import { buildExportPayload, signAllPages } from './lib/exportPayload'
 
 const ALLOWED = '.pdf,.jpg,.jpeg,.png,.tiff,.tif,.webp'
@@ -126,7 +126,7 @@ export default function App() {
       form.append('pages', JSON.stringify(pagesPayload))
       form.append('delete_pages', JSON.stringify([...deletedPages]))
 
-      const res = await fetch(`${API_BASE}/api/export`, { method: 'POST', body: form })
+      const res = await fetch(`${getApiBase()}/api/export`, { method: 'POST', body: form })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         throw new Error(resolveApiError(body.detail, t))
@@ -213,6 +213,9 @@ export default function App() {
 
         {/* Signatures list */}
         <div className="flex-1 overflow-y-auto border-t">
+          {sigs.error && (
+            <p className="px-3 py-2 text-red-500">{sigs.error}</p>
+          )}
           {sigs.signatures.map((sig) => (
             <div key={sig.id}
               draggable
