@@ -7,7 +7,7 @@
 
 [![Status](https://img.shields.io/badge/status-v1.0%20ready-brightgreen)](https://github.com/TinaUma/PDF_Signer)
 [![Python](https://img.shields.io/badge/python-3.11-blue?logo=python&logoColor=white)](https://python.org)
-[![React](https://img.shields.io/badge/react-18-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![React](https://img.shields.io/badge/react-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Docker](https://img.shields.io/badge/docker-compose-2496ED?logo=docker&logoColor=white)](https://docker.com)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
@@ -54,6 +54,9 @@ PDF Signer — инструмент для наложения рукописно
 - 🖱️ Интерактивный холст — drag & drop, resize, **rotate**, прозрачность
 - ↩️ Undo / Redo — в тулбаре и через Ctrl+Z / Ctrl+Y
 - 💾 Экспорт PDF и JPEG — оригинал не изменяется
+- 🗂️ Многостраничная подпись — свои подписи на каждой странице + кнопка «на все страницы»
+- 🎲 Уникализация подписи — лёгкие отличия каждого наложения, чтобы подписи не были идентичны
+- 🌐 Языки RU / EN — переключение интерфейса
 - 🧭 Пошаговые подсказки — сайдбар ведёт по шагам, активный шаг подсвечен
 - ⚡ Без переключения режимов — канвас готов сразу после загрузки документа
 - 🔒 Всё локально — никаких облаков, никакой регистрации
@@ -74,25 +77,28 @@ docker compose up
 
 Подписи сохраняются в `./data/signatures/` и не пропадают между перезапусками.
 
+> 🖥️ Нативная сборка (Tauri) пока экспериментальная — упаковка не завершена, используйте Docker.
+> 📄 Техническое задание: [docs/PDF_Signer_TZ_v1.0.pdf](docs/PDF_Signer_TZ_v1.0.pdf)
+
 ### Как пользоваться
 
 1. **Загрузи подпись** — левая панель → «+ Загрузить подпись» (JPG, PNG)  
    Фон удалится автоматически, можно отключить тумблером
 2. **Открой документ** — кнопка «Открыть документ» или перетащи файл
-3. **Режим подписи** — нажми «Разместить свою подпись»
-4. **Перетащи** подпись из библиотеки на документ
-5. **Настрой** — двигай, масштабируй, крути, меняй прозрачность
-6. **Сохрани** — «Вставить и сохранить» → скачается готовый файл
+3. **Перетащи** подпись из библиотеки на документ
+4. **Настрой** — двигай, масштабируй, крути, меняй прозрачность; для многостраничных — «на все страницы»
+5. **Сохрани** — «Вставить и сохранить» → скачается готовый файл
 
 ### Стек технологий
 
 | Слой | Технология |
 |---|---|
-| Frontend | React 18 · Vite · Tailwind CSS · **Konva.js** |
+| Frontend | React 19 · Vite · Tailwind CSS · **Konva.js** |
 | Backend | **FastAPI** · Python 3.11 · Uvicorn |
-| PDF | **PyMuPDF** (рендер + запись) |
+| PDF (рендер) | **pdfjs-dist** (Mozilla, в браузере) |
+| PDF (запись) | **PyMuPDF** (burn-in подписи) |
 | Удаление фона | Алгоритм на основе яркости пикселей · NumPy · Pillow |
-| Упаковка | **Docker Compose** · nginx |
+| Упаковка | **Docker Compose** · nginx · (Tauri — экспериментально) |
 
 ### Автор
 
@@ -137,6 +143,9 @@ PDF Signer is a tool for placing a handwritten signature (scan or photo) onto PD
 - 🖱️ Interactive canvas — drag & drop, resize, **rotate**, opacity control
 - ↩️ Undo / Redo — in the toolbar and via Ctrl+Z / Ctrl+Y
 - 💾 Export to PDF and JPEG — original file stays untouched
+- 🗂️ Multi-page signing — per-page signatures + an "all pages" action
+- 🎲 Signature uniquification — subtle per-placement variation so signatures aren't identical
+- 🌐 RU / EN — UI language switch
 - 🧭 Step-by-step hints — sidebar guides through the workflow, active step highlighted
 - ⚡ No mode switching — canvas is ready immediately after loading a document
 - 🔒 Fully local — no cloud, no registration
@@ -157,25 +166,29 @@ Open in browser: **http://localhost:8080**
 
 Signatures are stored in `./data/signatures/` and persist across restarts.
 
+> 🖥️ A native (Tauri) build is experimental — packaging is incomplete; use Docker.
+> 📄 Spec: [docs/PDF_Signer_TZ_v1.0.pdf](docs/PDF_Signer_TZ_v1.0.pdf)
+> 🛠 Developer guide: [docs/DEVELOPMENT.en.md](docs/DEVELOPMENT.en.md)
+
 ### How to use
 
 1. **Upload your signature** — left panel → "+ Upload signature" (JPG, PNG)  
    Background is removed automatically; toggle to disable
 2. **Open a document** — click "Open document" or drag & drop a file
-3. **Sign mode** — click "Place your signature"
-4. **Drag** a signature from the library onto the document
-5. **Adjust** — move, scale, rotate, set opacity
-6. **Save** — "Embed & Save" → the signed file downloads automatically
+3. **Drag** a signature from the library onto the document
+4. **Adjust** — move, scale, rotate, set opacity; for multi-page docs use "all pages"
+5. **Save** — "Embed & Save" → the signed file downloads automatically
 
 ### Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 18 · Vite · Tailwind CSS · **Konva.js** |
+| Frontend | React 19 · Vite · Tailwind CSS · **Konva.js** |
 | Backend | **FastAPI** · Python 3.11 · Uvicorn |
-| PDF | **PyMuPDF** (render + write) |
+| PDF (render) | **pdfjs-dist** (Mozilla, in browser) |
+| PDF (write) | **PyMuPDF** (signature burn-in) |
 | Background removal | Luminance-based pixel algorithm · NumPy · Pillow |
-| Packaging | **Docker Compose** · nginx |
+| Packaging | **Docker Compose** · nginx · (Tauri — experimental) |
 
 ### Author
 
