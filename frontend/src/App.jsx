@@ -69,7 +69,7 @@ export default function App() {
     setExportError(null)
     try {
       const layers = canvasLayersRef.current
-      const pagesPayload = [{ page_idx: doc.currentPage, stage_w: 794, stage_h: 1123, signatures: layers.map((l) => ({
+      const pagesPayload = [{ page_idx: doc.currentPage, stage_w: pageDims.width, stage_h: pageDims.height, signatures: layers.map((l) => ({
           id: l.sigId, x: l.x, y: l.y, w: l.width, h: l.height,
           angle: l.rotation, opacity: l.opacity,
         })) }]
@@ -99,6 +99,9 @@ export default function App() {
   }
 
   const docLoaded = doc.totalPages > 0
+  // Real pixel size of the current page; the Konva stage and the export payload
+  // both use it so the page aspect ratio is preserved (backend sx == sy).
+  const pageDims = doc.pageDims[doc.currentPage] || { width: 794, height: 1123 }
 
   // Step progress: 1=open doc, 2=upload sig, 3=drag to doc, 4=export
   const step = !docLoaded ? 1 : sigs.signatures.length === 0 ? 2 : !hasSigs ? 3 : 4
@@ -226,8 +229,8 @@ export default function App() {
           {!doc.loading && doc.pages[doc.currentPage] && (
             <CanvasEditor
               pageDataUrl={doc.pages[doc.currentPage]}
-              pageWidth={794}
-              pageHeight={1123}
+              pageWidth={pageDims.width}
+              pageHeight={pageDims.height}
               imageUrl={sigs.imageUrl}
               onLayersChange={handleLayersChange}
               onUndoStateChange={handleUndoStateChange}

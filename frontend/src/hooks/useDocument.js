@@ -18,8 +18,21 @@ function getExt(name) {
   return name.slice(name.lastIndexOf('.')).toLowerCase()
 }
 
+// Fallback dimensions (A4 @ ~96dpi) used only when an image fails to load.
+const FALLBACK_DIMS = { width: 794, height: 1123 }
+
+function loadImageDims(url) {
+  return new Promise((resolve) => {
+    const img = new window.Image()
+    img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight })
+    img.onerror = () => resolve({ ...FALLBACK_DIMS })
+    img.src = url
+  })
+}
+
 export function useDocument() {
-  const [pages, setPages] = useState([])   // array of ImageBitmap or canvas
+  const [pages, setPages] = useState([])   // array of data URLs / object URLs
+  const [pageDims, setPageDims] = useState([])  // real pixel size {width,height} per page
   const [currentPage, setCurrentPage] = useState(0)
   const [scale, setScale] = useState(1.0)
   const [loading, setLoading] = useState(false)
@@ -42,6 +55,7 @@ export function useDocument() {
 
     setLoading(true)
     setPages([])
+    setPageDims([])
     setCurrentPage(0)
     setFileName(file.name)
 
@@ -51,6 +65,7 @@ export function useDocument() {
       if (ext === '.pdf') {
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
         const rendered = []
+        const dims = []
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i)
           const viewport = page.getViewport({ scale: 1.5 })
@@ -59,11 +74,18 @@ export function useDocument() {
           canvas.height = viewport.height
           await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise
           rendered.push(canvas.toDataURL('image/png'))
+          // Real rendered pixel size. Stage uses the same size, so the page
+          // aspect ratio is preserved end-to-end and the backend's sx == sy
+          // (no signature distortion on non-A4 pages).
+          dims.push({ width: canvas.width, height: canvas.height })
         }
         setPages(rendered)
+        setPageDims(dims)
       } else {
         const url = URL.createObjectURL(file)
+        const dim = await loadImageDims(url)
         setPages([url])
+        setPageDims([dim])
       }
     } catch (e) {
       setError(`Ошибка при открытии файла: ${e.message}`)
@@ -77,7 +99,7 @@ export function useDocument() {
   }, [pages.length])
 
   return {
-    pages, currentPage, scale, loading, error, fileName,
+    pages, pageDims, currentPage, scale, loading, error, fileName,
     setScale, goTo, loadFile,
     totalPages: pages.length,
   }
