@@ -12,9 +12,9 @@ export function useSignatures() {
 
   const fetch_ = useCallback(async () => {
     const res = await fetch(API)
-    if (!res.ok) throw new Error('Failed to load signatures')
+    if (!res.ok) throw new Error(t('error.load_signatures_failed'))
     return res.json()
-  }, [])
+  }, [t])
 
   const load = useCallback(async () => {
     try {

@@ -1,9 +1,10 @@
-import { createContext, useContext, useState, useCallback, useMemo } from 'react'
+import { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react'
 import { ru } from './locales/ru'
 import { en } from './locales/en'
 
 const CATALOGS = { ru, en }
 const STORAGE_KEY = 'pdfsigner.lang'
+const DEFAULT_LANG = 'ru'  // product is Russian-first
 
 function detectInitialLang() {
   try {
@@ -13,7 +14,7 @@ function detectInitialLang() {
     /* localStorage unavailable */
   }
   const nav = (typeof navigator !== 'undefined' && navigator.language || '').slice(0, 2)
-  return CATALOGS[nav] ? nav : 'ru'
+  return CATALOGS[nav] ? nav : DEFAULT_LANG
 }
 
 const I18nContext = createContext(null)
@@ -37,6 +38,12 @@ export function I18nProvider({ children }) {
     const tpl = CATALOGS[lang]?.[key] ?? CATALOGS.en[key] ?? key
     if (!vars) return tpl
     return tpl.replace(/\{(\w+)\}/g, (_, name) => (name in vars ? vars[name] : `{${name}}`))
+  }, [lang])
+
+  // Reflect the active language on the document (a11y/SEO) and localize the title.
+  useEffect(() => {
+    document.documentElement.lang = lang
+    document.title = CATALOGS[lang]?.['app.title'] ?? 'PDF Signer'
   }, [lang])
 
   const value = useMemo(

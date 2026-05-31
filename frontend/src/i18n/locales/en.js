@@ -1,4 +1,5 @@
 export const en = {
+  'app.title': 'PDF Signer',
   'app.signaturesTitle': 'Signatures',
   'app.removeBg': 'Remove background',
   'app.uniquify': 'Uniquify signature',
@@ -57,5 +58,6 @@ export const en = {
     'No signature detected. Use a clearer image or turn off background removal.',
   'error.unsupported_signature_format': 'Unsupported signature format.',
   'error.signature_not_found': 'Signature not found.',
+  'error.load_signatures_failed': 'Could not load the signature list.',
   'error.all_pages_deleted': 'You cannot delete every page of the document.',
 }

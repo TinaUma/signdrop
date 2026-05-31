@@ -1,4 +1,5 @@
 export const ru = {
+  'app.title': 'PDF Signer',
   'app.signaturesTitle': 'Подписи',
   'app.removeBg': 'Удалить фон',
   'app.uniquify': 'Уникализация подписи',
@@ -57,5 +58,6 @@ export const ru = {
     'Подпись не распознана. Используйте более контрастное изображение или отключите удаление фона.',
   'error.unsupported_signature_format': 'Неподдерживаемый формат подписи.',
   'error.signature_not_found': 'Подпись не найдена.',
+  'error.load_signatures_failed': 'Не удалось загрузить список подписей.',
   'error.all_pages_deleted': 'Нельзя удалить все страницы документа.',
 }
