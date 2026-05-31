@@ -1,59 +1,115 @@
 # Changelog
 
-All notable changes to this project are documented in this file.
+[Русский](#русский) · [English](#english)
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/),
+проект следует [Semantic Versioning](https://semver.org/lang/ru/).
+
+---
+
+<a name="русский"></a>
+
+## 🇷🇺 Русский
+
+> Ведение: добавляйте записи в **[Unreleased]** по мере работы, группируя по
+> Added / Changed / Fixed / Security. На релизе переименуйте секцию в версию с
+> датой и заведите новую **[Unreleased]**.
+
+### [Unreleased]
+
+#### Added (Добавлено)
+- Многостраничная подпись: подписи хранятся по страницам, при экспорте
+  впечатывается каждая подписанная страница; кнопка «на все страницы».
+- Уникализация подписи (jitter): опциональная детерминированная вариация
+  (поворот, масштаб, прозрачность, смещение), чтобы повторные наложения одной
+  подписи не были пиксельно идентичны. Слайдер 0–100 %.
+- Удаление страниц: обратимая пометка листа на исключение из итогового PDF.
+- Интернационализация: лёгкий слой RU/EN с переключателем языка, сохранением
+  выбора и локализованными сообщениями об ошибках.
+
+#### Changed (Изменено)
+- API возвращает стабильные коды ошибок (`{code, message}`) вместо смешанного
+  RU/EN текста — локализует клиент.
+- Холст использует реальные размеры страницы вместо фиксированного A4.
+- Image-экспорт сохраняет формат источника (PNG/JPEG/TIFF/WEBP).
+- Харденинг Docker: бэкенд без host-порта (только через nginx), non-root
+  контейнеры, named volume для `/data`, security-заголовки nginx, CSP без
+  `unsafe-inline`.
+
+#### Fixed (Исправлено)
+- Экспорт PDF проверял координаты против неверной единицы (`page.rect*2`);
+  теперь — против stage-пространства (ложные отклонения/пропуски устранены).
+- Не-A4 документы искажались (stage был жёстко A4) — подпись больше не
+  растягивается неравномерно.
+- Удаление фона молча сохраняло прозрачный PNG, если чернил нет; теперь ошибка,
+  кадрирование по альфа-каналу.
+- Битые PDF/изображения возвращали 500; теперь 422.
+
+#### Security (Безопасность)
+- Закрыт path traversal: id подписи от клиента валидируется как UUID до
+  построения пути к файлу.
+- Лимиты анти-DoS: размер файла, число страниц, площадь pixmap, защита от
+  decompression-bomb (Pillow).
+
+### [1.0.0]
+
+#### Added (Добавлено)
+- Первый релиз: офлайн-подписание PDF/изображений — библиотека подписей с
+  автоудалением фона (по яркости), интерактивный Konva-холст
+  (drag/resize/rotate/opacity), undo/redo, навигация по страницам, экспорт в
+  PDF/JPEG. Бэкенд FastAPI, фронтенд React + Vite, деплой Docker Compose и
+  заготовка десктоп-обёртки Tauri.
+
+---
+
+<a name="english"></a>
+
+## 🇬🇧 English
 
 > Maintenance: add entries under **[Unreleased]** as work lands, grouped into
 > Added / Changed / Fixed / Security. On release, rename the section to the new
 > version with a date and start a fresh **[Unreleased]**.
 
-## [Unreleased]
+### [Unreleased]
 
-### Added
+#### Added
 - Multi-page signing: signatures are tracked per page and every signed page is
-  burned in on export (not just the current page), with an "all pages" action
-  that copies the current page's signatures everywhere.
-- Signature uniquification ("jitter"): optional, deterministic per-placement
-  variation (rotation, scale, opacity, offset) so the same signature placed
-  repeatedly — across pages or several on one page — is not pixel-identical.
-  Controlled by a 0–100% slider.
-- Internationalization: lightweight RU/EN i18n layer with a language switcher,
-  persisted language choice, and localized error messages.
+  burned in on export, with an "all pages" action.
+- Signature uniquification ("jitter"): optional deterministic per-placement
+  variation (rotation, scale, opacity, offset) via a 0–100 % slider.
+- Page deletion: reversible per-page toggle excluding a page from the export.
+- Internationalization: lightweight RU/EN layer with a language switcher,
+  persisted choice, and localized error messages.
 
-### Changed
-- The API now returns stable, machine-readable error codes (`{code, message}`)
-  instead of mixed Russian/English free-text, so the client localizes messages.
-- The editor canvas uses each document's real pixel dimensions instead of a
-  fixed A4 stage.
-- Image export preserves the source format (PNG/JPEG/TIFF/WEBP) instead of
-  always emitting JPEG.
-- Docker deployment hardened: backend no longer exposes a host port (reached
-  only via the nginx proxy), containers run as non-root, `/data` uses a named
-  volume, nginx sends security headers, and the Tauri CSP drops `unsafe-inline`.
+#### Changed
+- The API returns stable error codes (`{code, message}`) instead of mixed
+  Russian/English text; the client localizes them.
+- The editor canvas uses each document's real dimensions instead of a fixed A4.
+- Image export preserves the source format (PNG/JPEG/TIFF/WEBP).
+- Docker deployment hardened: no backend host port (nginx proxy only), non-root
+  containers, named `/data` volume, nginx security headers, CSP without
+  `unsafe-inline`.
 
-### Fixed
-- PDF export validated signature coordinates against the wrong unit
-  (`page.rect * 2`), causing false rejections on small pages and false passes on
-  large pages; it now validates against the stage coordinate space.
-- Non-A4 documents (Letter, landscape, images) were distorted because the stage
-  was hardcoded to A4; signatures are no longer non-uniformly stretched.
-- Background removal silently saved a fully transparent PNG when no ink was
-  detected; it now reports an error and crops by the alpha channel.
-- Corrupt PDFs/images returned HTTP 500; they now return 422.
+#### Fixed
+- PDF export validated coordinates against the wrong unit (`page.rect*2`); now
+  against the stage space (no more false rejections/passes).
+- Non-A4 documents were distorted (the stage was hardcoded to A4); signatures
+  are no longer non-uniformly stretched.
+- Background removal silently saved a transparent PNG when no ink was detected;
+  it now errors and crops by the alpha channel.
+- Corrupt PDFs/images returned 500; they now return 422.
 
-### Security
-- Closed a path-traversal vector: client-supplied signature ids are validated
-  as canonical UUIDs before being used to build a filesystem path.
-- Added anti-DoS resource limits: maximum upload size, page count, rasterized
-  pixmap area, and a Pillow decompression-bomb guard.
+#### Security
+- Closed a path-traversal vector: client signature ids are validated as UUIDs
+  before building a filesystem path.
+- Added anti-DoS limits: file size, page count, pixmap area, and a Pillow
+  decompression-bomb guard.
 
-## [1.0.0]
+### [1.0.0]
 
-### Added
-- Initial release: offline PDF/image signing tool — signature library with
-  automatic (luminance-based) background removal, interactive Konva canvas with
-  drag/resize/rotate/opacity, undo/redo, multi-page navigation, and export to
+#### Added
+- Initial release: offline PDF/image signing — signature library with automatic
+  (luminance-based) background removal, interactive Konva canvas
+  (drag/resize/rotate/opacity), undo/redo, multi-page navigation, export to
   PDF/JPEG. FastAPI backend, React + Vite frontend, Docker Compose deployment,
   and a scaffolded Tauri desktop wrapper.
