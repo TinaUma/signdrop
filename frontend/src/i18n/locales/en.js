@@ -60,4 +60,5 @@ export const en = {
   'error.signature_not_found': 'Signature not found.',
   'error.load_signatures_failed': 'Could not load the signature list.',
   'error.all_pages_deleted': 'You cannot delete every page of the document.',
+  'error.no_pages_left': 'No pages left after deletion.',
 }

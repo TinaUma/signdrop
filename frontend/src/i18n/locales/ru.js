@@ -60,4 +60,5 @@ export const ru = {
   'error.signature_not_found': 'Подпись не найдена.',
   'error.load_signatures_failed': 'Не удалось загрузить список подписей.',
   'error.all_pages_deleted': 'Нельзя удалить все страницы документа.',
+  'error.no_pages_left': 'После удаления не осталось страниц.',
 }

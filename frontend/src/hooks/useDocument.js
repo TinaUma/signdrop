@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from 'react'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import { useI18n } from '../i18n/index.jsx'
-import { FALLBACK_DIMS, MAX_FILE_SIZE, PDF_RENDER_SCALE } from '../constants'
+import { FALLBACK_DIMS, MAX_FILE_SIZE, MAX_PAGES, PDF_RENDER_SCALE } from '../constants'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl
 
@@ -70,6 +70,12 @@ export function useDocument() {
 
       if (ext === '.pdf') {
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+        // Cap client-side rendering (mirrors the backend) — a huge PDF would
+        // otherwise rasterize every page on the main thread and freeze the tab.
+        if (pdf.numPages > MAX_PAGES) {
+          setError(t('error.too_many_pages'))
+          return
+        }
         const rendered = []
         const dims = []
         for (let i = 1; i <= pdf.numPages; i++) {

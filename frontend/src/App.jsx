@@ -155,7 +155,8 @@ export default function App() {
       const srcExt = srcName.slice(srcName.lastIndexOf('.') + 1).toLowerCase()
       a.download = 'signed.' + (srcName.toLowerCase().endsWith('.pdf') ? 'pdf' : srcExt)
       a.click()
-      URL.revokeObjectURL(url)
+      // Defer revoke so the download isn't cancelled in some browsers.
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
     } catch (e) {
       setExportError(e.message)
     } finally {

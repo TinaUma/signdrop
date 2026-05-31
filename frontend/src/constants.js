@@ -3,6 +3,7 @@
 export const FALLBACK_DIMS = { width: 794, height: 1123 }
 
 export const MAX_FILE_SIZE = 50 * 1024 * 1024  // 50 MB (mirror backend/nginx)
+export const MAX_PAGES = 500  // mirror backend MAX_PAGES — cap client-side render
 export const MIN_LAYER_SIZE = 20  // min signature width/height in px
 export const DROP_MAX_WIDTH_FRACTION = 0.25  // dropped signature ≤ 25% of page width
 export const PDF_RENDER_SCALE = 1.5  // pdf.js viewport scale for page rendering
