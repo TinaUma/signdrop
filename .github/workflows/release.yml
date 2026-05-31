@@ -79,20 +79,17 @@ jobs:
 
       - name: Install frontend deps
         working-directory: frontend
-        run: npm install
+        run: npm ci
 
-      - name: Generate app icons
-        shell: pwsh
-        run: |
-          pip install pillow
-          python -c "from PIL import Image; Image.new('RGBA',(1024,1024),(37,99,235,255)).save('app-icon.png')"
-          npx --yes @tauri-apps/cli@^2 icon app-icon.png
+      # App icons are committed under src-tauri/icons/ (master: app-icon.png),
+      # so there is no icon-generation step here — tauri-action uses them as-is.
 
       - name: Build Tauri app & publish release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VITE_API_BASE: http://localhost:8000
+          # No VITE_API_BASE: the webview discovers the sidecar's dynamic port at
+          # runtime via the api_port Tauri command (src-tauri/src/lib.rs).
         with:
           tagName: ${{ needs.prepare.outputs.tag }}
           releaseName: PDF Signer ${{ needs.prepare.outputs.tag }}
