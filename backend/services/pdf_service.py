@@ -56,7 +56,12 @@ def render_document(filename: str, data: bytes) -> list[str]:
 
 
 def _render_pdf(data: bytes) -> list[str]:
-    doc = fitz.open(stream=data, filetype="pdf")
+    try:
+        doc = fitz.open(stream=data, filetype="pdf")
+    except Exception:
+        raise DomainError(
+            "corrupt_pdf", "Could not open PDF: file is corrupt or unsupported."
+        )
     try:
         ensure_render_safe(doc)
         pages = []
@@ -76,6 +81,12 @@ def _render_image(data: bytes) -> list[str]:
         img.load()  # force decode so a decompression bomb fails here
     except Image.DecompressionBombError:
         raise DomainError("image_too_large", "Image is too large to process safely.")
+    except DomainError:
+        raise
+    except Exception:
+        raise DomainError(
+            "corrupt_image", "Could not open image: file is corrupt or unsupported."
+        )
     buf = io.BytesIO()
     img.convert("RGBA").save(buf, format="PNG")
     return [base64.b64encode(buf.getvalue()).decode()]

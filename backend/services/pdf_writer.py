@@ -18,10 +18,17 @@ def export_pdf(
     """Burn signatures into PDF pages, return new PDF bytes. Pages whose original
     index is in `delete_pages` are omitted from the output."""
     src = fitz.open(stream=pdf_data, filetype="pdf")
-    ensure_render_safe(src)  # defense-in-depth: cap pages / pixmap area
     out = fitz.open()
+    try:
+        return _build_pdf(src, out, pages_payload, set(delete_pages or []))
+    finally:
+        out.close()
+        src.close()
+
+
+def _build_pdf(src, out, pages_payload, delete_set) -> bytes:
+    ensure_render_safe(src)  # defense-in-depth: cap pages / pixmap area
     sig_dir = get_signatures_dir()
-    delete_set = set(delete_pages or [])
 
     page_map = {p["page_idx"]: p["signatures"] for p in pages_payload}
 
@@ -66,10 +73,7 @@ def export_pdf(
         else:
             out.insert_pdf(src, from_page=i, to_page=i)
 
-    result = out.tobytes(deflate=True)
-    out.close()
-    src.close()
-    return result
+    return out.tobytes(deflate=True)
 
 
 def save_output(data: bytes, ext: str = "pdf") -> Path:

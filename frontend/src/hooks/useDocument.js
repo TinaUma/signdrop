@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import { useI18n } from '../i18n/index.jsx'
@@ -39,9 +39,14 @@ export function useDocument() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [fileName, setFileName] = useState(null)
+  const objectUrlRef = useRef(null)  // revoke the previous image blob URL
 
   const loadFile = useCallback(async (file) => {
     setError(null)
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current)
+      objectUrlRef.current = null
+    }
 
     if (file.size > MAX_FILE_SIZE) {
       setError(t('doc.tooBig', { size: (file.size / 1024 / 1024).toFixed(1) }))
@@ -85,6 +90,7 @@ export function useDocument() {
         setPageDims(dims)
       } else {
         const url = URL.createObjectURL(file)
+        objectUrlRef.current = url
         const dim = await loadImageDims(url)
         setPages([url])
         setPageDims([dim])

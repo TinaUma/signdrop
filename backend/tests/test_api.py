@@ -42,6 +42,24 @@ def test_render_unsupported_ext_rejected(client):
     assert r.json()["detail"]["code"] == "unsupported_file_type"
 
 
+def test_render_corrupt_pdf_returns_422(client):
+    r = client.post(
+        "/api/document/render",
+        files={"file": ("d.pdf", b"not a real pdf", "application/pdf")},
+    )
+    assert r.status_code == 422
+    assert r.json()["detail"]["code"] == "corrupt_pdf"
+
+
+def test_render_corrupt_image_returns_422(client):
+    r = client.post(
+        "/api/document/render",
+        files={"file": ("d.png", b"not a real image", "image/png")},
+    )
+    assert r.status_code == 422
+    assert r.json()["detail"]["code"] == "corrupt_image"
+
+
 def test_signatures_crud(client):
     up = client.post(
         "/api/signatures",

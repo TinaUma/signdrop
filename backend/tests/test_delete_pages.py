@@ -52,6 +52,13 @@ def test_no_delete_keeps_all_pages(client, make_pdf):
     assert _page_count(r.content) == 2
 
 
+def test_delete_all_pages_rejected(client, make_pdf):
+    pdf = make_pdf(pages=2)
+    r = _export(client, pdf, _empty_pages_payload(), delete_pages=[0, 1])
+    assert r.status_code == 422
+    assert r.json()["detail"]["code"] == "no_pages_left"
+
+
 def test_delete_pages_filters_bool_and_negative(client, make_pdf):
     # True (bool) and -1 must be ignored; only 0 deletes a page.
     pdf = make_pdf(pages=2)

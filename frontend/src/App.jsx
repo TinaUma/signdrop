@@ -53,12 +53,11 @@ export default function App() {
   }, [doc.loadId])
 
   const toggleDeletePage = () => {
-    setDeletedPages((prev) => {
-      const next = new Set(prev)
-      if (next.has(doc.currentPage)) next.delete(doc.currentPage)
-      else next.add(doc.currentPage)
-      return next
-    })
+    const next = new Set(deletedPages)
+    if (next.has(doc.currentPage)) next.delete(doc.currentPage)
+    else next.add(doc.currentPage)
+    setDeletedPages(next)
+    recomputeHasSigs(next)  // a deleted page must not count toward "ready to export"
   }
 
   const handleFileInput = (e) => {
@@ -81,10 +80,18 @@ export default function App() {
     finally { setUploading(false); e.target.value = '' }
   }
 
+  // True when at least one NON-deleted page carries a signature.
+  const recomputeHasSigs = (deleted) =>
+    setHasSigs(
+      Object.entries(layersByPageRef.current).some(
+        ([idx, l]) => l.length > 0 && !deleted.has(Number(idx)),
+      ),
+    )
+
   const handleLayersChange = useCallback((layers) => {
     layersByPageRef.current[doc.currentPage] = layers
-    setHasSigs(Object.values(layersByPageRef.current).some((l) => l.length > 0))
-  }, [doc.currentPage])
+    recomputeHasSigs(deletedPages)
+  }, [doc.currentPage, deletedPages])
 
   // Copy the current page's signatures onto every page.
   const handleSignAll = () => {

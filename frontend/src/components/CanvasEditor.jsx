@@ -83,6 +83,9 @@ export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, 
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e) => {
+      // Don't hijack Delete/Backspace while typing in the properties inputs.
+      const tag = e.target?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return
       if (e.key === 'Delete' || e.key === 'Backspace') {
         removeLayer(selectedId)  // graceful if null
         setSelectedId(null)

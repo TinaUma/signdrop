@@ -35,3 +35,11 @@ app.include_router(export_router)
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "pdf-signer-api"}
+
+
+if __name__ == "__main__":
+    # Entry point for the bundled sidecar (PyInstaller) so the .exe starts a
+    # server instead of importing `app` and exiting.
+    import uvicorn
+
+    uvicorn.run(app, host="127.0.0.1", port=8000)

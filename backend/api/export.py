@@ -102,6 +102,10 @@ async def export_document(
             )
         try:
             pdf_service.ensure_render_safe(doc)
+            if delete_list and len({i for i in delete_list if i < len(doc)}) >= len(
+                doc
+            ):
+                raise ApiError("no_pages_left", "No pages left after deletion.", 422)
             for p in pages_payload:
                 idx = p["page_idx"]
                 if idx >= len(doc):
