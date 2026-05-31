@@ -34,7 +34,15 @@ def test_signature_within_stage_on_small_page_not_rejected(client, make_pdf):
     # A 200pt-wide page: old bounds were page.rect.width*2 = 400, so a signature
     # at x=700 (valid in the 794-wide stage) was wrongly rejected. Must pass now.
     pdf = make_pdf(width=200, height=300)
-    sigs = [{"id": "missing", "x": 700, "y": 900, "w": 80, "h": 40}]
+    sigs = [
+        {
+            "id": "00000000-0000-4000-8000-000000000000",
+            "x": 700,
+            "y": 900,
+            "w": 80,
+            "h": 40,
+        }
+    ]
     r = _post(client, pdf, _pages(sigs))
     assert r.status_code == 200
     assert r.headers["content-type"] == "application/pdf"
@@ -42,20 +50,44 @@ def test_signature_within_stage_on_small_page_not_rejected(client, make_pdf):
 
 def test_signature_outside_stage_rejected(client, make_pdf):
     pdf = make_pdf(width=595, height=842)
-    sigs = [{"id": "missing", "x": 750, "y": 10, "w": 100, "h": 40}]  # 850 > 794
+    sigs = [
+        {
+            "id": "00000000-0000-4000-8000-000000000000",
+            "x": 750,
+            "y": 10,
+            "w": 100,
+            "h": 40,
+        }
+    ]  # 850 > 794
     r = _post(client, pdf, _pages(sigs))
     assert r.status_code == 422
 
 
 def test_negative_coordinate_rejected(client, make_pdf):
     pdf = make_pdf()
-    sigs = [{"id": "missing", "x": -5, "y": 10, "w": 50, "h": 40}]
+    sigs = [
+        {
+            "id": "00000000-0000-4000-8000-000000000000",
+            "x": -5,
+            "y": 10,
+            "w": 50,
+            "h": 40,
+        }
+    ]
     r = _post(client, pdf, _pages(sigs))
     assert r.status_code == 422
 
 
 def test_page_index_out_of_range_rejected(client, make_pdf):
     pdf = make_pdf(pages=1)
-    sigs = [{"id": "missing", "x": 10, "y": 10, "w": 50, "h": 40}]
+    sigs = [
+        {
+            "id": "00000000-0000-4000-8000-000000000000",
+            "x": 10,
+            "y": 10,
+            "w": 50,
+            "h": 40,
+        }
+    ]
     r = _post(client, pdf, _pages(sigs, page_idx=5))
     assert r.status_code == 422

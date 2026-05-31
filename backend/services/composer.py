@@ -2,6 +2,8 @@ from pathlib import Path
 
 from PIL import Image
 
+from services.signature_service import is_valid_sig_id
+
 
 def compose_page(
     page_img: Image.Image, signatures: list[dict], sig_dir: Path
@@ -15,6 +17,9 @@ def compose_page(
     result = base.convert("RGBA")
 
     for sig in signatures:
+        # Defense-in-depth: never build a path from a non-UUID id.
+        if not is_valid_sig_id(sig.get("id")):
+            continue
         sig_path = sig_dir / f"{sig['id']}.png"
         if not sig_path.exists():
             continue

@@ -8,7 +8,7 @@ from PIL import Image
 
 from services.pdf_writer import export_pdf, save_output
 from services.composer import compose_page
-from services.signature_service import get_signatures_dir
+from services.signature_service import get_signatures_dir, is_valid_sig_id
 
 router = APIRouter(prefix="/api/export", tags=["export"])
 
@@ -22,6 +22,15 @@ IMAGE_OUTPUT = {
     ".tif": ("TIFF", "image/tiff", ".tif"),
     ".webp": ("WEBP", "image/webp", ".webp"),
 }
+
+
+def _validate_sig_ids(sigs: list[dict]):
+    """Reject client-supplied signature ids that are not canonical UUIDs,
+    closing the path-traversal vector via sig['id'] (composer builds a file
+    path from it)."""
+    for s in sigs:
+        if not is_valid_sig_id(s.get("id")):
+            raise HTTPException(status_code=422, detail="Invalid signature id")
 
 
 def _validate_signatures(sigs: list[dict], page_w: float, page_h: float):
@@ -65,6 +74,7 @@ async def export_document(
                 # rejections (small pages) and false passes (large pages).
                 stage_w = p.get("stage_w", 794)
                 stage_h = p.get("stage_h", 1123)
+                _validate_sig_ids(p["signatures"])
                 _validate_signatures(p["signatures"], stage_w, stage_h)
             doc.close()
         except HTTPException:
@@ -91,6 +101,7 @@ async def export_document(
             )
         page_info = pages_payload[0] if pages_payload else {}
         sigs = page_info.get("signatures", [])
+        _validate_sig_ids(sigs)
         stage_w = page_info.get("stage_w", 0)
         stage_h = page_info.get("stage_h", 0)
         if not stage_w or not stage_h:

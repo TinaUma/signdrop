@@ -1,5 +1,6 @@
 import io
 import os
+import re
 import uuid
 from pathlib import Path
 
@@ -11,6 +12,21 @@ DATA_DIR = Path(os.environ.get("DATA_DIR", "./data"))
 SIGNATURES_DIR = DATA_DIR / "signatures"
 
 SUPPORTED_EXTS = {".jpg", ".jpeg", ".png", ".tiff", ".tif", ".webp"}
+
+_UUID_RE = re.compile(
+    r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
+    r"[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+)
+
+
+def is_valid_sig_id(sig_id) -> bool:
+    """True only for canonical UUID strings.
+
+    Signature ids are server-generated UUIDs (save_signature). Anything else is
+    rejected so a client-supplied id can never traverse out of the signatures
+    directory when used to build a filesystem path.
+    """
+    return isinstance(sig_id, str) and bool(_UUID_RE.match(sig_id))
 
 
 def _remove_bg_adaptive(img: Image.Image, darkness_threshold: int = 35) -> Image.Image:
@@ -92,6 +108,8 @@ def save_signature(filename: str, data: bytes, remove_bg: bool = True) -> dict:
 
 
 def delete_signature(sig_id: str) -> bool:
+    if not is_valid_sig_id(sig_id):
+        return False
     path = get_signatures_dir() / f"{sig_id}.png"
     if not path.exists():
         return False
@@ -100,5 +118,7 @@ def delete_signature(sig_id: str) -> bool:
 
 
 def get_signature_path(sig_id: str) -> Path | None:
+    if not is_valid_sig_id(sig_id):
+        return None
     path = get_signatures_dir() / f"{sig_id}.png"
     return path if path.exists() else None
