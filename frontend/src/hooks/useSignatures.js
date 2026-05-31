@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useI18n, resolveApiError } from '../i18n/index.jsx'
+import { API_BASE } from '../constants'
 
-const API = '/api/signatures'
+const API = `${API_BASE}/api/signatures`
 
 export function useSignatures() {
   const { t } = useI18n()

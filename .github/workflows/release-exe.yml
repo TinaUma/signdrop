@@ -54,6 +54,9 @@ jobs:
           npx --yes @tauri-apps/cli@^2 icon app-icon.png
 
       - name: Build Tauri app
+        env:
+          # The webview can't use relative /api; point the SPA at the sidecar.
+          VITE_API_BASE: http://localhost:8000
         run: npx --yes @tauri-apps/cli@^2 build
 
       - name: Publish prerelease

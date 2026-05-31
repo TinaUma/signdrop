@@ -5,7 +5,7 @@ import { useSignatures } from './hooks/useSignatures'
 import { CanvasEditor } from './components/CanvasEditor'
 import { LanguageSwitcher } from './i18n/LanguageSwitcher'
 import { useI18n, resolveApiError } from './i18n/index.jsx'
-import { FALLBACK_DIMS } from './constants'
+import { FALLBACK_DIMS, API_BASE } from './constants'
 
 const ALLOWED = '.pdf,.jpg,.jpeg,.png,.tiff,.tif,.webp'
 
@@ -141,7 +141,7 @@ export default function App() {
       form.append('pages', JSON.stringify(pagesPayload))
       form.append('delete_pages', JSON.stringify([...deletedPages]))
 
-      const res = await fetch('/api/export', { method: 'POST', body: form })
+      const res = await fetch(`${API_BASE}/api/export`, { method: 'POST', body: form })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         throw new Error(resolveApiError(body.detail, t))
