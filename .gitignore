@@ -58,3 +58,4 @@ Thumbs.db
 _cache/
 AGENTS.md
 .mcp.json
+release-build.log

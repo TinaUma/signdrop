@@ -16,8 +16,26 @@ case "$TRIPLE" in
   *)         EXT="" ;;
 esac
 
+# Interpreter for the PyInstaller sidecar build. MUST be a LEAN env (only the
+# backend's runtime deps), or the sidecar balloons — a global Python with
+# torch/scipy/pandas produced a ~273MB sidecar vs ~43MB from the project venv
+# (dead-end #24). Override with PYTHON=... ; default to the repo's .venv when
+# present (a bare `python` on Windows/git-bash can resolve to a fat global env
+# even with the venv on PATH), else fall back to `python`.
+ROOT="$(pwd)"
+if [ -n "${PYTHON:-}" ]; then
+  PY="$PYTHON"
+elif [ -x "$ROOT/.venv/Scripts/python.exe" ]; then
+  PY="$ROOT/.venv/Scripts/python.exe"   # Windows venv
+elif [ -x "$ROOT/.venv/bin/python" ]; then
+  PY="$ROOT/.venv/bin/python"           # POSIX venv
+else
+  PY="python"
+fi
+echo "==> Using Python: $PY ($("$PY" -c 'import sys;print(sys.executable)'))"
+
 echo "==> [1/6] Build FastAPI sidecar (PyInstaller)"
-(cd backend && python -m PyInstaller api_server.spec --distpath dist --workpath build_pyi --noconfirm)
+(cd backend && "$PY" -m PyInstaller api_server.spec --distpath dist --workpath build_pyi --noconfirm)
 
 echo "==> [2/6] Place sidecar under the Rust target triple ($TRIPLE)"
 mkdir -p src-tauri/binaries
