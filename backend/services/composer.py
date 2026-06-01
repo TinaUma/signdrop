@@ -1,4 +1,5 @@
 import hashlib
+import math
 from pathlib import Path
 
 from PIL import Image
@@ -7,27 +8,70 @@ from services.signature_service import is_valid_sig_id
 
 
 def _jitter_params(sig_id: str, index: int, intensity: float, page: int = 0):
-    """Deterministic per-instance jitter so repeated placements of the same
-    signature (across pages or several on one page) are not pixel-identical.
+    """Deterministic per-instance DEFORMATION so repeated placements of the same
+    signature look hand-redrawn (different slant, proportions, lean), not just
+    nudged. A person never signs identically twice; this fakes that variance.
 
-    Returns (d_angle_deg, scale_mult, opacity_mult, dx_px, dy_px). intensity<=0
-    yields a neutral transform. Seeded by (sig_id, page, index) → reproducible
-    and distinct across pages and positions.
+    Returns (d_angle_deg, scale_x, scale_y, skew_x, opacity_mult, dx_px, dy_px).
+    `skew_x` is a horizontal shear FACTOR (matches Konva's skewX, ≈tan of the
+    slant). intensity<=0 yields a neutral transform. Seeded by (sig_id, page,
+    index) → reproducible and distinct across pages and positions. The frontend
+    mirrors this in lib/jitter.js for a WYSIWYG canvas preview — keep both in
+    sync.
     """
     if intensity <= 0:
-        return (0.0, 1.0, 1.0, 0, 0)
+        return (0.0, 1.0, 1.0, 0.0, 1.0, 0, 0)
     intensity = min(intensity, 1.0)
     h = hashlib.sha256(f"{sig_id}:{page}:{index}".encode()).digest()
 
     def unit(i):  # map a byte to [-1, 1]
         return (h[i] / 255.0) * 2 - 1
 
-    d_angle = unit(0) * 2.5 * intensity  # ±2.5°
-    scale_mult = 1 + unit(1) * 0.04 * intensity  # ±4%
-    opacity_mult = 1 - (h[2] / 255.0) * 0.10 * intensity  # 0..-10%
-    dx = round(unit(3) * 3 * intensity)  # ±3 px
-    dy = round(unit(4) * 3 * intensity)
-    return (d_angle, scale_mult, opacity_mult, dx, dy)
+    d_angle = unit(0) * 5.0 * intensity  # ±5°
+    scale_x = 1 + unit(1) * 0.10 * intensity  # ±10% (independent axes -> reshape)
+    scale_y = 1 + unit(5) * 0.10 * intensity  # ±10%
+    skew_x = unit(2) * 0.18 * intensity  # ±0.18 ≈ ±10° slant
+    opacity_mult = 1 - (h[6] / 255.0) * 0.08 * intensity  # 0..-8% (pen pressure)
+    dx = round(unit(3) * 4 * intensity)  # ±4 px
+    dy = round(unit(4) * 4 * intensity)
+    return (d_angle, scale_x, scale_y, skew_x, opacity_mult, dx, dy)
+
+
+def _paste_transformed(result, img, x, y, angle_deg, skew_x):
+    """Paste `img` onto `result` under the affine Konva applies to a placed node:
+    world = translate(x,y) · rotate(angle) · skew(skewX) · local, with the node
+    origin (top-left) at (x, y). One Image.transform with the exact same matrix
+    keeps the server output pixel-aligned with the canvas preview (any non-uniform
+    scale is already baked into img's size by the caller, so scale=1 here)."""
+    w, h = img.size
+    theta = math.radians(angle_deg)
+    cos, sin = math.cos(theta), math.sin(theta)
+    # L = R · K, with K = [[1, skew_x], [0, 1]] (Konva skewX, skewY=0).
+    l00, l01 = cos, cos * skew_x - sin
+    l10, l11 = sin, sin * skew_x + cos
+
+    det = l00 * l11 - l01 * l10
+    if abs(det) < 1e-9:  # degenerate transform — fall back to a plain paste
+        result.paste(img, (round(x), round(y)), img)
+        return
+
+    corners = ((0, 0), (w, 0), (0, h), (w, h))
+    xs = [l00 * u + l01 * v for u, v in corners]
+    ys = [l10 * u + l11 * v for u, v in corners]
+    min_x, max_x = min(xs), max(xs)
+    min_y, max_y = min(ys), max(ys)
+    out_w = max(1, math.ceil(max_x - min_x))
+    out_h = max(1, math.ceil(max_y - min_y))
+
+    # Inverse linear map (PIL AFFINE maps output px -> input px).
+    i00, i01 = l11 / det, -l01 / det
+    i10, i11 = -l10 / det, l00 / det
+    c = i00 * min_x + i01 * min_y
+    f = i10 * min_x + i11 * min_y
+    transformed = img.transform(
+        (out_w, out_h), Image.AFFINE, (i00, i01, c, i10, i11, f), resample=Image.BICUBIC
+    )
+    result.paste(transformed, (round(x + min_x), round(y + min_y)), transformed)
 
 
 def _resolve_sig_image(
@@ -91,14 +135,17 @@ def compose_page(
             intensity = float(sig.get("jitter", jitter))
         except (TypeError, ValueError):
             intensity = 0.0
-        d_angle, scale_mult, opacity_mult, dx, dy = _jitter_params(
+        d_angle, scale_x, scale_y, skew_x, opacity_mult, dx, dy = _jitter_params(
             sig["id"], index, intensity, page_index
         )
 
         sig_img = src_img.convert("RGBA")
 
-        w = max(1, round(int(sig["w"]) * scale_mult))
-        h = max(1, round(int(sig["h"]) * scale_mult))
+        # Bake the (non-uniform) scale into the bitmap size; skew + rotation are
+        # then applied by _paste_transformed with scale=1, matching Konva, which
+        # also folds the deformation scale into the rendered width/height.
+        w = max(1, round(int(sig["w"]) * scale_x))
+        h = max(1, round(int(sig["h"]) * scale_y))
         sig_img = sig_img.resize((w, h), Image.LANCZOS)
 
         opacity = max(0.0, min(1.0, sig.get("opacity", 1.0) * opacity_mult))
@@ -109,21 +156,10 @@ def compose_page(
 
         x = int(sig["x"]) + dx
         y = int(sig["y"]) + dy
-
         angle = sig.get("angle", 0) + d_angle
-        if angle:
-            # Konva rotates the layer about its top-left corner at (x, y) —
-            # offsetX/Y are 0 (CanvasEditor KonvaImage). Replicate that pivot:
-            # centre the corner in a padded canvas, so rotating about the canvas
-            # centre == rotating about the corner, then paste so the corner
-            # returns to (x, y). PIL's plain centre-pivot rotate shifted rotated
-            # signatures ~14-22px off from where the user placed them.
-            canvas = Image.new("RGBA", (w * 2, h * 2), (0, 0, 0, 0))
-            canvas.paste(sig_img, (w, h))
-            canvas = canvas.rotate(-angle, expand=True, resample=Image.BICUBIC)
-            ox = round(x - canvas.width / 2)
-            oy = round(y - canvas.height / 2)
-            result.paste(canvas, (ox, oy), canvas)
+
+        if angle or skew_x:
+            _paste_transformed(result, sig_img, x, y, angle, skew_x)
         else:
             result.paste(sig_img, (x, y), sig_img)
 

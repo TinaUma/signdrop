@@ -3,6 +3,7 @@ import { Stage, Layer, Image as KonvaImage, Transformer } from 'react-konva'
 import { useCanvas } from '../hooks/useCanvas'
 import { useI18n } from '../i18n/index.jsx'
 import { MIN_LAYER_SIZE, DROP_MAX_WIDTH_FRACTION } from '../constants'
+import { jitterParams, IDENTITY_JITTER } from '../lib/jitter'
 
 function PageBackground({ dataUrl, width, height }) {
   const [img, setImg] = useState(null)
@@ -15,10 +16,13 @@ function PageBackground({ dataUrl, width, height }) {
   return img ? <KonvaImage image={img} x={0} y={0} width={width} height={height} listening={false} /> : null
 }
 
-function SignatureNode({ layer, isSelected, onSelect, onChange, imageUrl }) {
+function SignatureNode({ layer, page, index, isSelected, onSelect, onChange, imageUrl }) {
   const imgRef = useRef(null)
   const trRef = useRef(null)
   const [img, setImg] = useState(null)
+  // Live preview of the per-instance uniquification, recomputed (deterministic,
+  // matches the export) whenever the placement or its jitter changes.
+  const [jit, setJit] = useState(IDENTITY_JITTER)
 
   useEffect(() => {
     const image = new window.Image()
@@ -27,34 +31,55 @@ function SignatureNode({ layer, isSelected, onSelect, onChange, imageUrl }) {
   }, [layer.sigId, imageUrl])
 
   useEffect(() => {
+    let alive = true
+    jitterParams(layer.sigId, page, index, layer.jitter || 0).then((j) => {
+      if (alive) setJit(j)
+    })
+    return () => {
+      alive = false
+    }
+  }, [layer.sigId, page, index, layer.jitter])
+
+  useEffect(() => {
     if (isSelected && trRef.current && imgRef.current) {
       trRef.current.nodes([imgRef.current])
       trRef.current.getLayer().batchDraw()
     }
   }, [isSelected])
 
+  // Render with the deformation applied (non-uniform scale baked into the draw
+  // size + skew + rotation + offset, exactly as the server composes it); editing
+  // handlers divide/subtract it back out so the stored base coords stay clean (no
+  // drift on repeated drag/transform).
+  const sx = jit.scaleX || 1
+  const sy = jit.scaleY || 1
+
   return (
     <>
       <KonvaImage
         ref={imgRef}
         image={img}
-        x={layer.x}
-        y={layer.y}
-        width={layer.width}
-        height={layer.height}
-        rotation={layer.rotation}
-        opacity={layer.opacity}
+        x={layer.x + jit.dx}
+        y={layer.y + jit.dy}
+        width={layer.width * sx}
+        height={layer.height * sy}
+        skewX={jit.skewX}
+        rotation={layer.rotation + jit.dAngle}
+        opacity={Math.max(0, Math.min(1, layer.opacity * jit.opacity))}
         draggable
         onClick={() => onSelect(layer.id)}
         onTap={() => onSelect(layer.id)}
-        onDragEnd={(e) => onChange(layer.id, { x: e.target.x(), y: e.target.y() })}
+        onDragEnd={(e) =>
+          onChange(layer.id, { x: e.target.x() - jit.dx, y: e.target.y() - jit.dy })
+        }
         onTransformEnd={(e) => {
           const node = e.target
           onChange(layer.id, {
-            x: node.x(), y: node.y(),
-            width: Math.max(MIN_LAYER_SIZE, node.width() * node.scaleX()),
-            height: Math.max(MIN_LAYER_SIZE, node.height() * node.scaleY()),
-            rotation: node.rotation(),
+            x: node.x() - jit.dx,
+            y: node.y() - jit.dy,
+            width: Math.max(MIN_LAYER_SIZE, (node.width() * node.scaleX()) / sx),
+            height: Math.max(MIN_LAYER_SIZE, (node.height() * node.scaleY()) / sy),
+            rotation: node.rotation() - jit.dAngle,
           })
           node.scaleX(1)
           node.scaleY(1)
@@ -71,7 +96,7 @@ function SignatureNode({ layer, isSelected, onSelect, onChange, imageUrl }) {
   )
 }
 
-export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, imageUrl, initialLayers = [], onLayersChange, onUndoStateChange }) {
+export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, pageIndex = 0, imageUrl, initialLayers = [], onLayersChange, onUndoStateChange }) {
   const { t } = useI18n()
   const { layers, addSignature, updateLayer, updateLayerLive, checkpoint, removeLayer, undo, redo, canUndo, canRedo } = useCanvas(initialLayers)
   const [selectedId, setSelectedId] = useState(null)
@@ -150,10 +175,12 @@ export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, 
         >
           <Layer>
             <PageBackground dataUrl={pageDataUrl} width={pageWidth} height={pageHeight} />
-            {layers.map((layer) => (
+            {layers.map((layer, index) => (
               <SignatureNode
                 key={layer.id}
                 layer={layer}
+                page={pageIndex}
+                index={index}
                 isSelected={layer.id === selectedId}
                 onSelect={setSelectedId}
                 onChange={updateLayer}

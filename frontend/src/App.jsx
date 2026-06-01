@@ -291,6 +291,7 @@ export default function App() {
                 pageDataUrl={doc.pages[doc.currentPage]}
                 pageWidth={pageDims.width}
                 pageHeight={pageDims.height}
+                pageIndex={doc.currentPage}
                 imageUrl={sigs.imageUrl}
                 initialLayers={layersByPageRef.current[doc.currentPage] || []}
                 onLayersChange={handleLayersChange}
