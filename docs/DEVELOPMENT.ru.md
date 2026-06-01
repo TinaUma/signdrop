@@ -126,6 +126,11 @@ npm run dev                        # http://localhost:5173
 
 `DATA_DIR` (по умолчанию `./data`) содержит `signatures/` и `output/`.
 
+Переменные окружения: `DATA_DIR` (корень хранилища), `DEMO_MODE` (stateless демо),
+`PDF_SIGNER_PORT` (порт сайдкара) и `CORS_ALLOWED_ORIGINS` — список доп. CORS-origin
+через запятую, добавляемый к встроенным по умолчанию (напр. свой домен демо); не
+задано = только дефолты.
+
 ## Тестирование
 
 ```bash

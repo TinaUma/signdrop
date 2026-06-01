@@ -6,13 +6,15 @@ from api.document import router as document_router
 from api.export import router as export_router
 from api.signatures import router as signatures_router
 from api.history import router as history_router
-from constants import APP_VERSION
+from constants import APP_VERSION, cors_extra_origins
 
 app = FastAPI(title="PDF Signer API", version=APP_VERSION)
 
 # The browser deployment talks to the API same-origin through the nginx proxy,
 # so CORS is only needed for the dev server and the Tauri webview. Restrict to
-# those known origins instead of "*" (the API is unauthenticated).
+# those known origins instead of "*" (the API is unauthenticated). A deployment
+# behind a custom domain can add origins via the CORS_ALLOWED_ORIGINS env var
+# (comma-separated) without editing this list.
 ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://127.0.0.1:8080",
@@ -24,7 +26,7 @@ ALLOWED_ORIGINS = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=ALLOWED_ORIGINS + cors_extra_origins(),
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type"],  # the API only needs the upload content type
 )

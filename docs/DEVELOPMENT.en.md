@@ -126,6 +126,11 @@ npm run dev                        # http://localhost:5173
 
 `DATA_DIR` (default `./data`) holds `signatures/` and `output/`.
 
+Env vars: `DATA_DIR` (storage root), `DEMO_MODE` (stateless demo), `PDF_SIGNER_PORT`
+(sidecar port), and `CORS_ALLOWED_ORIGINS` — a comma-separated list of extra
+allowed CORS origins appended to the built-in defaults (e.g. a custom demo
+domain); unset = defaults only.
+
 ## Testing
 
 ```bash

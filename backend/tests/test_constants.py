@@ -29,3 +29,25 @@ def test_data_dir_dev_default_is_relative_data(monkeypatch):
     monkeypatch.delenv("DATA_DIR", raising=False)
     monkeypatch.setattr(sys, "frozen", False, raising=False)
     assert constants.get_data_dir() == Path("./data")
+
+
+def test_cors_extra_origins_unset_is_empty(monkeypatch):
+    monkeypatch.delenv("CORS_ALLOWED_ORIGINS", raising=False)
+    assert constants.cors_extra_origins() == []
+
+
+def test_cors_extra_origins_parses_trims_and_keeps_order(monkeypatch):
+    monkeypatch.setenv(
+        "CORS_ALLOWED_ORIGINS",
+        " https://demo.example.com , https://a.test ",
+    )
+    assert constants.cors_extra_origins() == [
+        "https://demo.example.com",
+        "https://a.test",
+    ]
+
+
+def test_cors_extra_origins_drops_empty_entries(monkeypatch):
+    # Malformed/empty value must not yield empty-string origins or crash.
+    monkeypatch.setenv("CORS_ALLOWED_ORIGINS", ",,  ,")
+    assert constants.cors_extra_origins() == []

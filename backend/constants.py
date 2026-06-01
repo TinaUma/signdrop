@@ -33,6 +33,18 @@ def is_demo_mode() -> bool:
     return os.environ.get("DEMO_MODE", "").strip().lower() in _DEMO_TRUE
 
 
+def cors_extra_origins() -> list[str]:
+    """Extra CORS allow-origins from the CORS_ALLOWED_ORIGINS env var.
+
+    Comma-separated, whitespace-trimmed, empty entries dropped; order preserved.
+    Appended to the built-in default allowlist in main.py so a deployment behind
+    a custom domain can be added without a code change. Empty/unset -> []. Read
+    at app-creation time (CORS middleware is configured once at import).
+    """
+    raw = os.environ.get("CORS_ALLOWED_ORIGINS", "")
+    return [origin.strip() for origin in raw.split(",") if origin.strip()]
+
+
 def get_data_dir() -> Path:
     r"""Root directory for persisted data (uploaded signatures, exported docs).
 
