@@ -48,12 +48,26 @@ export function useExport({
         const file = new File([blob], meta.filename || 'document', { type: blob.type })
         const layers = {}
         for (const p of meta.pages || []) {
-          layers[p.page_idx] = (p.signatures || []).map((s, i) => ({
+          const sigLayers = (p.signatures || []).map((s, i) => ({
             id: `${s.id}-h${p.page_idx}-${i}`,
+            type: 'signature',
             sigId: s.id,
             x: s.x, y: s.y, width: s.w, height: s.h,
             rotation: s.angle ?? 0, opacity: s.opacity ?? 1, jitter: s.jitter ?? 0,
           }))
+          const textLayers = (p.texts || []).map((tx, i) => ({
+            id: `text-${p.page_idx}-${i}-${tx.x}`,
+            type: 'text',
+            text: tx.text ?? '',
+            x: tx.x, y: tx.y, width: 240,
+            fontSize: tx.fontSize ?? 32,
+            fontFamily: tx.family ?? 'sans',
+            bold: !!tx.bold, italic: !!tx.italic,
+            color: tx.color ?? '#111827',
+            align: tx.align ?? 'left',
+            rotation: tx.angle ?? 0, opacity: tx.opacity ?? 1,
+          }))
+          layers[p.page_idx] = [...sigLayers, ...textLayers]
         }
         pendingLayersRef.current = layers
         pendingDeletedRef.current = new Set(meta.delete_pages || [])

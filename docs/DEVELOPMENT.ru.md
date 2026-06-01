@@ -76,7 +76,8 @@ Form: `file` (изображение). Возвращает `{ "id": "<uuid>", "
 
 ### `POST /api/export`
 Form: `file`; `pages` (JSON); `delete_pages` (JSON-список индексов, опц.).
-`pages` — список `{ page_idx, stage_w, stage_h, jitter, signatures: [{ id, x, y, w, h, angle, opacity }] }`.
+`pages` — список `{ page_idx, stage_w, stage_h, jitter, signatures: [{ id, x, y, w, h, angle, opacity }], texts: [{ text, x, y, fontSize, family, bold, italic, color, align, angle, opacity }] }`.
+Геометрия текста (вкл. `fontSize`) масштабируется stage→raster как подписи; `family` = `sans`|`serif`|`handwriting`. Лимиты: `MAX_TEXTS_PER_PAGE`, `MAX_TEXT_LEN` (→ 422 / 413).
 Возвращает подписанный PDF или изображение (формат источника сохраняется).
 Ошибки: `invalid_pages_payload`, `file_too_large` (413), `corrupt_pdf`,
 `corrupt_image`, `page_index_out_of_range`, `stage_aspect_mismatch`,
@@ -100,6 +101,11 @@ Form: `file`; `pages` (JSON); `delete_pages` (JSON-список индексов
   переключатель, не деструктивная правка оригинала).
 - **Лимиты** (анти-DoS): `MAX_FILE_SIZE` 50 МБ, `MAX_PAGES` 500,
   `MAX_PIXMAP_PIXELS` ~64 Мп, защита от decompression-bomb в Pillow.
+- **Текстовые поля** (`services/text_render`): встроенные шрифты в `backend/fonts/`
+  (DejaVu Sans/Serif + рукописный Caveat), рендерятся через PIL и накладываются как
+  подписи. Фронтенд грузит те же шрифты через `@font-face` (`frontend/public/fonts/`),
+  поэтому холст WYSIWYG с экспортом. Перенос строк — только по явным переводам строки
+  (без авто-переноса), чтобы холст и PDF совпадали.
 - **Демо-режим** (`DEMO_MODE=1`, `constants.is_demo_mode()`): сервер не хранит
   ничего. `POST /api/signatures` удаляет фон в памяти и возвращает PNG инлайном в
   base64 (без записи на диск); список/изображение/переименование/удаление и

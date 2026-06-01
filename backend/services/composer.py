@@ -5,6 +5,7 @@ from pathlib import Path
 from PIL import Image
 
 from services.signature_service import is_valid_sig_id
+from services.text_render import DEFAULT_FAMILY, render_text
 
 
 def _jitter_params(sig_id: str, index: int, intensity: float, page: int = 0):
@@ -103,6 +104,7 @@ def compose_page(
     jitter: float = 0.0,
     page_index: int = 0,
     sig_images: dict[str, Image.Image] | None = None,
+    texts: list[dict] | None = None,
 ) -> Image.Image:
     """Overlay signatures onto a page image. Returns RGB image with white
     background. Uniquification is per signature: each sig may carry its own
@@ -163,4 +165,33 @@ def compose_page(
         else:
             result.paste(sig_img, (x, y), sig_img)
 
+    _render_texts(result, texts)
     return result
+
+
+def _render_texts(result: Image.Image, texts: list[dict] | None) -> None:
+    """Draw text annotations onto the page. Each item's geometry (x, y, fontSize)
+    is already scaled to page-image space by the caller, mirroring signatures.
+    A malformed item is skipped (never raises) so one bad entry can't 500."""
+    for t in texts or []:
+        try:
+            img = render_text(
+                t.get("text", ""),
+                family=t.get("family", DEFAULT_FAMILY),
+                bold=bool(t.get("bold", False)),
+                italic=bool(t.get("italic", False)),
+                px=int(t.get("fontSize", 32)),
+                color=t.get("color", "#000000"),
+                align=t.get("align", "left"),
+                opacity=float(t.get("opacity", 1.0)),
+            )
+        except (TypeError, ValueError):
+            continue
+        if img is None:  # empty/whitespace text
+            continue
+        x, y = int(t.get("x", 0)), int(t.get("y", 0))
+        angle = t.get("angle", 0) or 0
+        if angle:
+            _paste_transformed(result, img, x, y, angle, 0.0)
+        else:
+            result.paste(img, (x, y), img)

@@ -55,7 +55,8 @@ PDF Signer — инструмент для наложения рукописно
 - ↩️ Undo / Redo — в тулбаре и через Ctrl+Z / Ctrl+Y
 - 💾 Экспорт PDF и JPEG — оригинал не изменяется
 - 🗂️ Многостраничная подпись — свои подписи на каждой странице + кнопка «на все страницы»
-- 🎲 Уникализация подписи — лёгкие отличия каждого наложения, чтобы подписи не были идентичны
+- 🎲 Уникализация подписи — деформация каждого наложения (наклон, пропорции), чтобы подписи не были идентичны
+- 🔤 Текстовые поля — добавь текст с выбором шрифта (без засечек / с засечками / рукописный), размера, жирности, курсива, цвета и выравнивания
 - 🌐 Языки RU / EN — переключение интерфейса
 - 🧭 Пошаговые подсказки — сайдбар ведёт по шагам, активный шаг подсвечен
 - ⚡ Без переключения режимов — канвас готов сразу после загрузки документа
@@ -117,6 +118,10 @@ docker compose -f docker-compose.yml -f docker-compose.demo.yml up
 | Удаление фона | Алгоритм на основе яркости пикселей · NumPy · Pillow |
 | Упаковка | **Docker Compose** · nginx · (Tauri — экспериментально) |
 
+### Шрифты
+
+Текстовые поля используют встроенные шрифты: **DejaVu Sans / Serif** (свободная лицензия) и **Caveat** (рукописный, [OFL](https://openfontlicense.org)). Тексты лицензий — в `backend/fonts/` и `frontend/public/fonts/`.
+
 ### Автор
 
 Разработано [TinaUma](https://github.com/TinaUma) · портфолио-проект  
@@ -162,7 +167,8 @@ PDF Signer is a tool for placing a handwritten signature (scan or photo) onto PD
 - ↩️ Undo / Redo — in the toolbar and via Ctrl+Z / Ctrl+Y
 - 💾 Export to PDF and JPEG — original file stays untouched
 - 🗂️ Multi-page signing — per-page signatures + an "all pages" action
-- 🎲 Signature uniquification — subtle per-placement variation so signatures aren't identical
+- 🎲 Signature uniquification — per-placement deformation (slant, proportions) so signatures aren't identical
+- 🔤 Text boxes — add text with a font choice (sans / serif / handwriting), size, bold, italic, color and alignment
 - 🌐 RU / EN — UI language switch
 - 🧭 Step-by-step hints — sidebar guides through the workflow, active step highlighted
 - ⚡ No mode switching — canvas is ready immediately after loading a document
@@ -223,6 +229,10 @@ Full guide (HTTPS/reverse proxy, verification, updating, troubleshooting): [docs
 | PDF (write) | **PyMuPDF** (signature burn-in) |
 | Background removal | Luminance-based pixel algorithm · NumPy · Pillow |
 | Packaging | **Docker Compose** · nginx · (Tauri — experimental) |
+
+### Fonts
+
+Text boxes use bundled fonts: **DejaVu Sans / Serif** (free license) and **Caveat** (handwriting, [OFL](https://openfontlicense.org)). License texts live in `backend/fonts/` and `frontend/public/fonts/`.
 
 ### Author
 

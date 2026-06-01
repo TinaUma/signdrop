@@ -13,6 +13,8 @@ SUPPORTED_PDF_EXTS = {".pdf"}
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
 MAX_PAGES = 500  # reject absurd page counts (DoS)
 MAX_SIGS_PER_PAGE = 100  # reject absurd signature counts per page (DoS)
+MAX_TEXTS_PER_PAGE = 100  # reject absurd text-annotation counts per page (DoS)
+MAX_TEXT_LEN = 5000  # cap a single text annotation's length (DoS)
 # Cap raw `pages` JSON before parsing (DoS). Kept under Starlette's ~1MB
 # multipart part limit so this explicit 413 fires first; legit payloads (a few
 # pages × a few signatures) are a few KB.

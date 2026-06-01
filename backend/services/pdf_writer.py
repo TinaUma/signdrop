@@ -37,6 +37,7 @@ def _build_pdf(src, out, pages_payload, delete_set, sig_images=None) -> bytes:
     sig_dir = None if sig_images is not None else get_signatures_dir()
 
     page_map = {p["page_idx"]: p["signatures"] for p in pages_payload}
+    texts_map = {p["page_idx"]: p.get("texts", []) for p in pages_payload}
 
     stage_map = {
         p["page_idx"]: (
@@ -50,7 +51,11 @@ def _build_pdf(src, out, pages_payload, delete_set, sig_images=None) -> bytes:
     for i, page in enumerate(src):
         if i in delete_set:
             continue  # page removed from the exported document
-        if i in page_map and page_map[i]:
+        page_sigs = page_map.get(i) or []
+        page_texts = texts_map.get(i) or []
+        # Render the page (rasterise + overlay) if it carries signatures OR text;
+        # a text-only page must not fall through to a verbatim copy.
+        if page_sigs or page_texts:
             pix = page.get_pixmap(dpi=RENDER_DPI)
             img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
             stage_w, stage_h = stage_map.get(i, (STAGE_FALLBACK_W, STAGE_FALLBACK_H))
@@ -64,7 +69,16 @@ def _build_pdf(src, out, pages_payload, delete_set, sig_images=None) -> bytes:
                     "w": s["w"] * sx,
                     "h": s["h"] * sy,
                 }
-                for s in page_map[i]
+                for s in page_sigs
+            ]
+            scaled_texts = [
+                {
+                    **t,
+                    "x": t["x"] * sx,
+                    "y": t["y"] * sy,
+                    "fontSize": t["fontSize"] * sx,
+                }
+                for t in page_texts
             ]
             composed = compose_page(
                 img,
@@ -73,6 +87,7 @@ def _build_pdf(src, out, pages_payload, delete_set, sig_images=None) -> bytes:
                 jitter=jitter_map.get(i, 0),
                 page_index=i,
                 sig_images=sig_images,
+                texts=scaled_texts,
             )
 
             buf = io.BytesIO()

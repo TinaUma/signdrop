@@ -8,6 +8,7 @@ export function useCanvas(initialLayers = []) {
   const addSignature = useCallback((sig, x = 100, y = 100, width = 200, height = 80) => {
     push([...layers, {
       id: `${sig.id}-${Date.now()}`,
+      type: 'signature',
       sigId: sig.id,
       x, y,
       width: Math.max(MIN_LAYER_SIZE, width),
@@ -16,6 +17,28 @@ export function useCanvas(initialLayers = []) {
       opacity: 1,
       jitter: 0,  // 0..1 — per-instance uniquification, set in the properties panel
     }])
+  }, [layers, push])
+
+  // Add a text annotation. Returns the new layer id so the caller can select it
+  // (and immediately open the inline editor).
+  const addText = useCallback((x = 80, y = 80) => {
+    const id = `text-${Date.now()}`
+    push([...layers, {
+      id,
+      type: 'text',
+      text: '',
+      x, y,
+      width: 240,            // wrap width (px); height follows the content
+      fontSize: 32,
+      fontFamily: 'sans',    // logical key (lib/fonts) — sans | serif | handwriting
+      bold: false,
+      italic: false,
+      color: '#111827',
+      align: 'left',
+      rotation: 0,
+      opacity: 1,
+    }])
+    return id
   }, [layers, push])
 
   const updateLayer = useCallback((id, props) => {
@@ -35,5 +58,5 @@ export function useCanvas(initialLayers = []) {
     push(layers.filter((l) => l.id !== id))
   }, [layers, push])
 
-  return { layers, addSignature, updateLayer, updateLayerLive, checkpoint, removeLayer, undo, redo, canUndo, canRedo }
+  return { layers, addSignature, addText, updateLayer, updateLayerLive, checkpoint, removeLayer, undo, redo, canUndo, canRedo }
 }

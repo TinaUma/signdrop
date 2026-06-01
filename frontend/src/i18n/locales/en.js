@@ -68,7 +68,20 @@ export const en = {
   'props.uniquify': 'Uniquify',
   'props.uniquifyHint': 'Slight random variation of this one signature (rotation, scale, opacity, offset)',
   'props.delete': 'Delete',
-  'props.selectHint': 'Select a signature',
+  'props.selectHint': 'Select an object',
+
+  'text.add': 'Add a text box',
+  'text.addShort': 'Text',
+  'text.edit': 'Edit text',
+  'text.font': 'Font',
+  'text.size': 'Size',
+  'text.bold': 'Bold',
+  'text.italic': 'Italic',
+  'text.color': 'Color',
+  'text.align': 'Align',
+  'text.fontSans': 'Sans',
+  'text.fontSerif': 'Serif',
+  'text.fontHand': 'Handwriting',
 
   'doc.tooBig': 'File is too large ({size} MB). Maximum is 50 MB.',
   'doc.unsupported':

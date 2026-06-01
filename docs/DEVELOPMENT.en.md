@@ -77,7 +77,8 @@ Returns `{ "deleted": "<id>" }`. `signature_not_found` (404).
 
 ### `POST /api/export`
 Form: `file`; `pages` (JSON); `delete_pages` (JSON list of page indices, optional).
-`pages` is a list of `{ page_idx, stage_w, stage_h, jitter, signatures: [{ id, x, y, w, h, angle, opacity }] }`.
+`pages` is a list of `{ page_idx, stage_w, stage_h, jitter, signatures: [{ id, x, y, w, h, angle, opacity }], texts: [{ text, x, y, fontSize, family, bold, italic, color, align, angle, opacity }] }`.
+Text geometry (incl. `fontSize`) is scaled stage→raster like signatures; `family` is `sans`|`serif`|`handwriting`. Caps: `MAX_TEXTS_PER_PAGE`, `MAX_TEXT_LEN` (→ 422 / 413).
 Returns the signed PDF or image (source format preserved).
 Errors: `invalid_pages_payload`, `file_too_large` (413), `corrupt_pdf`,
 `corrupt_image`, `page_index_out_of_range`, `stage_aspect_mismatch`,
@@ -100,6 +101,11 @@ Returns `{ "status": "ok", "service": "pdf-signer-api" }`.
   (reversible toggle; not a destructive edit of the source).
 - **Limits** (anti-DoS): `MAX_FILE_SIZE` 50 MB, `MAX_PAGES` 500,
   `MAX_PIXMAP_PIXELS` ~64 MP, Pillow decompression-bomb guard.
+- **Text annotations** (`services/text_render`): bundled fonts in `backend/fonts/`
+  (DejaVu Sans/Serif + Caveat handwriting), rendered with PIL and composited like
+  signatures. The frontend loads the same faces via `@font-face`
+  (`frontend/public/fonts/`) so the canvas is WYSIWYG with the export. Text wraps
+  only on explicit newlines (no soft-wrap), keeping canvas and PDF identical.
 - **Demo mode** (`DEMO_MODE=1`, `constants.is_demo_mode()`): the server persists
   nothing. `POST /api/signatures` runs background removal in memory and returns
   the PNG inline as base64 (no disk write); the listing/image/rename/delete

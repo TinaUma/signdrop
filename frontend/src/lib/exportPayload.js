@@ -13,11 +13,12 @@ export function buildExportPayload({ layersByPage, pageDims, deletedPages }) {
     .filter((idx) => layersByPage[idx]?.length > 0 && !deletedPages.has(idx))
     .map((idx) => {
       const dims = pageDims[idx] || FALLBACK_DIMS
-      return {
-        page_idx: idx,
-        stage_w: dims.width,
-        stage_h: dims.height,
-        signatures: layersByPage[idx].map((l) => ({
+      const layers = layersByPage[idx]
+      // Signatures and text are distinct layer types but share the per-page
+      // store; the export payload keeps them in separate lists.
+      const signatures = layers
+        .filter((l) => l.type !== 'text')
+        .map((l) => ({
           id: l.sigId,
           x: l.x,
           y: l.y,
@@ -26,8 +27,23 @@ export function buildExportPayload({ layersByPage, pageDims, deletedPages }) {
           angle: l.rotation,
           opacity: l.opacity,
           jitter: l.jitter ?? 0,
-        })),
-      }
+        }))
+      const texts = layers
+        .filter((l) => l.type === 'text' && l.text && l.text.trim())
+        .map((l) => ({
+          text: l.text,
+          x: l.x,
+          y: l.y,
+          fontSize: l.fontSize,
+          family: l.fontFamily,
+          bold: !!l.bold,
+          italic: !!l.italic,
+          color: l.color,
+          align: l.align,
+          angle: l.rotation,
+          opacity: l.opacity,
+        }))
+      return { page_idx: idx, stage_w: dims.width, stage_h: dims.height, signatures, texts }
     })
 }
 

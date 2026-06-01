@@ -4,6 +4,9 @@ import { useCanvas } from '../hooks/useCanvas'
 import { useI18n } from '../i18n/index.jsx'
 import { MIN_LAYER_SIZE, DROP_MAX_WIDTH_FRACTION } from '../constants'
 import { jitterParams, IDENTITY_JITTER } from '../lib/jitter'
+import { TextNode } from './TextNode'
+import { TextEditorOverlay } from './TextEditorOverlay'
+import { TextProperties } from './TextProperties'
 
 function PageBackground({ dataUrl, width, height }) {
   const [img, setImg] = useState(null)
@@ -98,9 +101,36 @@ function SignatureNode({ layer, page, index, isSelected, onSelect, onChange, ima
 
 export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, pageIndex = 0, imageUrl, initialLayers = [], onLayersChange, onUndoStateChange }) {
   const { t } = useI18n()
-  const { layers, addSignature, updateLayer, updateLayerLive, checkpoint, removeLayer, undo, redo, canUndo, canRedo } = useCanvas(initialLayers)
+  const { layers, addSignature, addText, updateLayer, updateLayerLive, checkpoint, removeLayer, undo, redo, canUndo, canRedo } = useCanvas(initialLayers)
   const [selectedId, setSelectedId] = useState(null)
+  const [editingId, setEditingId] = useState(null)  // text layer being edited inline
   const stageRef = useRef(null)
+
+  const handleAddText = () => {
+    const id = addText()
+    setSelectedId(id)
+    setEditingId(id)  // open the inline editor immediately
+  }
+
+  // Finish an inline edit. An empty/whitespace result drops the box (so adding
+  // text then typing nothing / Escaping leaves no stray layer). `cancelled`
+  // keeps the layer's existing text rather than the textarea value.
+  const finishEdit = (text, cancelled = false) => {
+    const id = editingId
+    setEditingId(null)
+    if (!id) return
+    const current = layers.find((l) => l.id === id)
+    const finalText = (cancelled ? current?.text : text) || ''
+    if (!finalText.trim()) {
+      removeLayer(id)
+      setSelectedId((c) => (c === id ? null : c))
+      return
+    }
+    if (!cancelled) {
+      checkpoint()
+      updateLayerLive(id, { text: finalText })
+    }
+  }
 
   useEffect(() => { onLayersChange?.(layers) }, [layers, onLayersChange])
 
@@ -157,6 +187,7 @@ export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, 
   }, [addSignature, imageUrl, pageWidth])
 
   const selectedLayer = layers.find((l) => l.id === selectedId)
+  const editingLayer = layers.find((l) => l.id === editingId)
 
   return (
     <div className="flex flex-1 overflow-hidden">
@@ -175,29 +206,52 @@ export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, 
         >
           <Layer>
             <PageBackground dataUrl={pageDataUrl} width={pageWidth} height={pageHeight} />
-            {layers.map((layer, index) => (
-              <SignatureNode
-                key={layer.id}
-                layer={layer}
-                page={pageIndex}
-                index={index}
-                isSelected={layer.id === selectedId}
-                onSelect={setSelectedId}
-                onChange={updateLayer}
-                imageUrl={imageUrl}
-              />
-            ))}
+            {layers.map((layer, index) =>
+              layer.type === 'text' ? (
+                <TextNode
+                  key={layer.id}
+                  layer={layer}
+                  isSelected={layer.id === selectedId}
+                  onSelect={setSelectedId}
+                  onChange={updateLayer}
+                  onEdit={(id) => { setSelectedId(id); setEditingId(id) }}
+                />
+              ) : (
+                <SignatureNode
+                  key={layer.id}
+                  layer={layer}
+                  page={pageIndex}
+                  index={index}
+                  isSelected={layer.id === selectedId}
+                  onSelect={setSelectedId}
+                  onChange={updateLayer}
+                  imageUrl={imageUrl}
+                />
+              ),
+            )}
           </Layer>
         </Stage>
       </div>
 
       {/* Properties panel */}
       <div className="w-52 bg-white border-l flex flex-col text-xs">
-        <div className="px-3 py-2 border-b font-medium text-gray-700">{t('props.title')}</div>
+        <div className="px-3 py-2 border-b font-medium text-gray-700 flex items-center justify-between gap-2">
+          <span>{t('props.title')}</span>
+          <button
+            onClick={handleAddText}
+            title={t('text.add')}
+            className="text-blue-600 border border-blue-200 rounded px-1.5 py-0.5 hover:bg-blue-50 font-normal"
+          >
+            + {t('text.addShort')}
+          </button>
+        </div>
 
         {selectedLayer ? (
           <div className="px-3 py-2 flex flex-col gap-2">
-            {[['X', 'x'], ['Y', 'y'], ['W', 'width'], ['H', 'height']].map(([label, key]) => (
+            {(selectedLayer.type === 'text'
+              ? [['X', 'x'], ['Y', 'y'], ['W', 'width']]
+              : [['X', 'x'], ['Y', 'y'], ['W', 'width'], ['H', 'height']]
+            ).map(([label, key]) => (
               <label key={key} className="flex items-center gap-2">
                 <span className="w-4 text-gray-500">{label}</span>
                 <input type="number" value={Math.round(selectedLayer[key])}
@@ -220,15 +274,30 @@ export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, 
                 onChange={(e) => updateLayerLive(selectedLayer.id, { opacity: Number(e.target.value) / 100 })}
                 className="w-full" />
             </label>
-            <label className="flex flex-col gap-1" title={t('props.uniquifyHint')}>
-              <span className={(selectedLayer.jitter || 0) > 0 ? 'text-blue-600 font-medium' : 'text-gray-500'}>
-                {t('props.uniquify')} {Math.round((selectedLayer.jitter || 0) * 100)}%
-              </span>
-              <input type="range" min={0} max={100} value={Math.round((selectedLayer.jitter || 0) * 100)}
-                onPointerDown={checkpoint}
-                onChange={(e) => updateLayerLive(selectedLayer.id, { jitter: Number(e.target.value) / 100 })}
-                className="w-full" />
-            </label>
+            {selectedLayer.type !== 'text' && (
+              <label className="flex flex-col gap-1" title={t('props.uniquifyHint')}>
+                <span className={(selectedLayer.jitter || 0) > 0 ? 'text-blue-600 font-medium' : 'text-gray-500'}>
+                  {t('props.uniquify')} {Math.round((selectedLayer.jitter || 0) * 100)}%
+                </span>
+                <input type="range" min={0} max={100} value={Math.round((selectedLayer.jitter || 0) * 100)}
+                  onPointerDown={checkpoint}
+                  onChange={(e) => updateLayerLive(selectedLayer.id, { jitter: Number(e.target.value) / 100 })}
+                  className="w-full" />
+              </label>
+            )}
+            {selectedLayer.type === 'text' && (
+              <>
+                <TextProperties
+                  layer={selectedLayer}
+                  onLive={updateLayerLive}
+                  checkpoint={checkpoint}
+                />
+                <button onClick={() => setEditingId(selectedLayer.id)}
+                  className="border border-gray-200 rounded py-1 text-gray-600 hover:bg-gray-50">
+                  {t('text.edit')}
+                </button>
+              </>
+            )}
             <button onClick={() => { removeLayer(selectedLayer.id); setSelectedId(null) }}
               className="mt-2 text-red-500 border border-red-200 rounded py-1 hover:bg-red-50">
               {t('props.delete')}
@@ -238,6 +307,15 @@ export function CanvasEditor({ pageDataUrl, pageWidth = 794, pageHeight = 1123, 
           <p className="text-gray-400 px-3 py-3">{t('props.selectHint')}</p>
         )}
       </div>
+
+      {editingId && editingLayer && (
+        <TextEditorOverlay
+          layer={editingLayer}
+          stage={stageRef.current}
+          onCommit={(t) => finishEdit(t)}
+          onCancel={() => finishEdit(null, true)}
+        />
+      )}
     </div>
   )
 }

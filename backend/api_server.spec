@@ -9,7 +9,9 @@ a = Analysis(
     ['main.py'],
     pathex=[SPECPATH],
     binaries=[],
-    datas=[],
+    # Bundle the text-annotation fonts so the sidecar renders text offline; they
+    # land under sys._MEIPASS/fonts, where services.text_render._fonts_dir looks.
+    datas=[('fonts', 'fonts')],
     hiddenimports=[
         'uvicorn.logging',
         'uvicorn.loops',

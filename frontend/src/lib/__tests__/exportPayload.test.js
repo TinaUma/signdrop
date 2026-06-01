@@ -32,6 +32,28 @@ describe('buildExportPayload', () => {
     expect(out[0].signatures[0].jitter).toBe(0)
   })
 
+  it('splits signatures and text layers into separate lists', () => {
+    const text = {
+      id: 't1', type: 'text', text: 'Привет', x: 5, y: 6, width: 240, fontSize: 28,
+      fontFamily: 'serif', bold: true, italic: false, color: '#ff0000', align: 'center',
+      rotation: 3, opacity: 0.9,
+    }
+    const blank = { ...text, id: 't2', text: '   ' } // whitespace -> dropped
+    const out = buildExportPayload({
+      layersByPage: { 0: [layer('a'), text, blank] },
+      pageDims: { 0: { width: 100, height: 200 } },
+      deletedPages: new Set(),
+    })
+    expect(out[0].signatures).toHaveLength(1)
+    expect(out[0].signatures[0].id).toBe('a')
+    expect(out[0].texts).toHaveLength(1) // blank text dropped
+    expect(out[0].texts[0]).toEqual({
+      text: 'Привет', x: 5, y: 6, fontSize: 28, family: 'serif',
+      bold: true, italic: false, color: '#ff0000', align: 'center',
+      angle: 3, opacity: 0.9,
+    })
+  })
+
   it('falls back to A4 dims when pageDims is missing', () => {
     const out = buildExportPayload({
       layersByPage: { 0: [layer('a')] }, pageDims: {}, deletedPages: new Set(),

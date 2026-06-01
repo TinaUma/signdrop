@@ -142,6 +142,29 @@ def _validate_payload_shape(pages_payload):
             # composer (a placement the user never asked for); reject explicitly.
             if s["w"] <= 0 or s["h"] <= 0:
                 raise ApiError("invalid_pages_payload", "Invalid pages payload.")
+        texts = p.get("texts", [])
+        if not isinstance(texts, list):
+            raise ApiError("invalid_pages_payload", "Invalid pages payload.")
+        if len(texts) > pdf_service.MAX_TEXTS_PER_PAGE:
+            raise ApiError("invalid_pages_payload", "Too many text items on a page.")
+        for tx in texts:
+            if not isinstance(tx, dict) or not isinstance(tx.get("text"), str):
+                raise ApiError("invalid_pages_payload", "Invalid pages payload.")
+            if len(tx["text"]) > pdf_service.MAX_TEXT_LEN:
+                raise ApiError("text_too_long", "Text is too long.", 413)
+            if not all(_is_number(tx.get(k)) for k in ("x", "y", "fontSize")):
+                raise ApiError("invalid_pages_payload", "Invalid pages payload.")
+            if tx["fontSize"] <= 0:
+                raise ApiError("invalid_pages_payload", "Invalid pages payload.")
+
+
+def _scale_texts(texts, sx, sy):
+    """Scale text geometry from stage space to image/raster space. sx==sy is
+    enforced for signatures, so fontSize scales by sx."""
+    return [
+        {**t, "x": t["x"] * sx, "y": t["y"] * sy, "fontSize": t["fontSize"] * sx}
+        for t in texts or []
+    ]
 
 
 def _validate_signatures(sigs: list[dict], page_w: float, page_h: float):
@@ -306,6 +329,7 @@ async def export_document(
             jitter=page_info.get("jitter", 0),
             page_index=page_info.get("page_idx", 0),
             sig_images=sig_images,
+            texts=_scale_texts(page_info.get("texts", []), sx, sy),
         )
         fmt, media_type, out_ext = IMAGE_OUTPUT[ext]
         buf = io.BytesIO()

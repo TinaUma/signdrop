@@ -55,6 +55,17 @@ describe('useCanvas', () => {
     expect(result.current.layers).toHaveLength(1)
   })
 
+  it('addText creates a selectable text layer and returns its id', () => {
+    const { result } = renderHook(() => useCanvas())
+    let id
+    act(() => { id = result.current.addText(40, 50) })
+    const layer = result.current.layers[0]
+    expect(layer.id).toBe(id)
+    expect(layer.type).toBe('text')
+    expect(layer).toMatchObject({ x: 40, y: 50, fontFamily: 'sans', bold: false, italic: false })
+    expect(typeof layer.fontSize).toBe('number')
+  })
+
   it('seeds from initialLayers', () => {
     const initial = [{ id: 'x', sigId: SIG.id, x: 1, y: 1, width: 30, height: 30, rotation: 0, opacity: 1 }]
     const { result } = renderHook(() => useCanvas(initial))

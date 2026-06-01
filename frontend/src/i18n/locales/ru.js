@@ -68,7 +68,20 @@ export const ru = {
   'props.uniquify': 'Уникализация',
   'props.uniquifyHint': 'Лёгкие случайные отличия именно этой подписи (поворот, масштаб, прозрачность, смещение)',
   'props.delete': 'Удалить',
-  'props.selectHint': 'Выберите подпись',
+  'props.selectHint': 'Выберите объект',
+
+  'text.add': 'Добавить текстовое поле',
+  'text.addShort': 'Текст',
+  'text.edit': 'Редактировать текст',
+  'text.font': 'Шрифт',
+  'text.size': 'Размер',
+  'text.bold': 'Жирный',
+  'text.italic': 'Курсив',
+  'text.color': 'Цвет',
+  'text.align': 'Выравнивание',
+  'text.fontSans': 'Без засечек',
+  'text.fontSerif': 'С засечками',
+  'text.fontHand': 'Рукописный',
 
   'doc.tooBig': 'Файл слишком большой ({size} МБ). Максимум — 50 МБ.',
   'doc.unsupported':
