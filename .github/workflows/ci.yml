@@ -27,7 +27,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # node 24 ships npm 11, which generated the lockfile. node 20's
+          # npm 10.8.2 rejects `npm ci` over optional wasm transitive deps
+          # (@emnapi/*) it expects materialized; pdfjs-dist also needs >=22.13.
+          node-version: "24"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
