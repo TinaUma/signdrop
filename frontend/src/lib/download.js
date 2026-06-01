@@ -1,6 +1,14 @@
 import { inTauri } from '../constants'
 import { blobToDataUrl } from './blobCodec'
 
+// Build the saved filename from the original document name + a "_signed"
+// postfix, e.g. "contract.pdf" -> "contract_signed.pdf". Falls back to
+// "document" when the original name is missing.
+export function signedName(original, ext) {
+  const base = (original || 'document').replace(/\.[^./\\]+$/, '').trim() || 'document'
+  return `${base}_signed.${ext || 'pdf'}`
+}
+
 // Save a Blob to disk. In the Tauri app the HTML `<a download>` trick is a no-op
 // (WebView2 has no download handler), so we round-trip the bytes to a native
 // Save dialog via the `save_file` command. In the browser / Docker build we use

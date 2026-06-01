@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useI18n } from '../i18n/index.jsx'
-import { saveBlob } from '../lib/download'
+import { saveBlob, signedName } from '../lib/download'
 
 // Format an ISO timestamp for display; fall back to the raw string if Date can't
 // parse it (never throw inside render).
@@ -23,7 +23,7 @@ export function HistoryModal({ history, onReopen, onClose }) {
     setDlError(null)
     try {
       const blob = await getResultBlob(entry.id)
-      if (blob) await saveBlob(`signed.${entry.ext || 'pdf'}`, blob)
+      if (blob) await saveBlob(signedName(entry.filename, entry.ext), blob)
     } catch (e) {
       setDlError(e.message)
     }

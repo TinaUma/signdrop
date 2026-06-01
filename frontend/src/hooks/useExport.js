@@ -3,7 +3,7 @@ import { useI18n, resolveApiError } from '../i18n/index.jsx'
 import { getApiBase } from '../constants'
 import { isDemoMode } from '../lib/config'
 import { buildExportPayload } from '../lib/exportPayload'
-import { saveBlob } from '../lib/download'
+import { saveBlob, signedName } from '../lib/download'
 
 // Owns the "produce the signed file" concern: building the export request,
 // downloading the result, recording history, and reopening a past export for
@@ -119,7 +119,8 @@ export function useExport({
       const blob = await res.blob()
       const srcName = sourceFileRef.current.name
       const srcExt = srcName.slice(srcName.lastIndexOf('.') + 1).toLowerCase()
-      const outName = 'signed.' + (srcName.toLowerCase().endsWith('.pdf') ? 'pdf' : srcExt)
+      const outExt = srcName.toLowerCase().endsWith('.pdf') ? 'pdf' : srcExt
+      const outName = signedName(srcName, outExt)
       // Native Save dialog in the app; anchor download in the browser/Docker.
       await saveBlob(outName, blob)
       // Normal mode persisted a history entry server-side — refresh the list.
