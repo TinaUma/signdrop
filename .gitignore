@@ -50,7 +50,6 @@ Thumbs.db
 
 # TAUSIK — весь локальный рантайм фреймворка (venv, БД, конфиг с абсолютными путями)
 .tausik/
-.tausik-lib/
 
 # Claude Code / TAUSIK internal
 .claude/
