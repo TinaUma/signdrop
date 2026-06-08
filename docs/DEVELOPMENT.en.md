@@ -1,11 +1,11 @@
-# PDF Signer — Developer Guide (EN)
+# SignDrop — Developer Guide (EN)
 
 Русская версия: [DEVELOPMENT.ru.md](DEVELOPMENT.ru.md)
 · ← [README](../README.md#english) · [CHANGELOG](../CHANGELOG.md#english)
 
 ## Overview
 
-PDF Signer is an offline tool that overlays a handwritten signature onto PDF and
+SignDrop is an offline tool that overlays a handwritten signature onto PDF and
 image documents. It runs fully locally: a React + Konva frontend talks to a
 FastAPI backend that rasterises pages, removes the signature background, and
 burns signatures into the output file. The original document is never modified.
@@ -87,7 +87,7 @@ Errors: `invalid_pages_payload`, `file_too_large` (413), `corrupt_pdf`,
 `page_too_large`, `image_too_large`, `no_pages_left` (all 422).
 
 ### `GET /health`
-Returns `{ "status": "ok", "service": "pdf-signer-api" }`.
+Returns `{ "status": "ok", "service": "signdrop-api" }`.
 
 ## Key behaviors
 
@@ -179,7 +179,7 @@ push to main and on pull requests.
   | **Linux** | `webkit2gtk-4.1`, `libgtk-3-dev`, `libayatana-appindicator3-dev`, `librsvg2-dev`, `build-essential` (Debian/Ubuntu names) | `bash scripts/build-exe.sh` | `*.deb`, `*.rpm`, `*.AppImage` |
 
   Tauri only cross-compiles within reason — build each OS's installers **on that
-  OS** (or its CI runner). To run the loose binary, keep `pdf-signer` and
+  OS** (or its CI runner). To run the loose binary, keep `signdrop` and
   `api-server` together: the app launches the sidecar from beside itself.
 
   CI (`release.yml`) builds the full **Windows** release on **merge to main**: it

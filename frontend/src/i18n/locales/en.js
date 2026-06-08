@@ -1,5 +1,5 @@
 export const en = {
-  'app.title': 'PDF Signer',
+  'app.title': 'SignDrop',
   'app.signaturesTitle': 'Signatures',
   'app.removeBg': 'Remove background',
   'app.uploadSignature': '+ Upload signature',
@@ -35,7 +35,7 @@ export const en = {
   'about.close': 'Close',
   'about.version': 'Version',
   'about.description':
-    'PDF Signer is an offline PDF and image signer: upload a signature, drag it onto the document, and save. Your files never leave your computer.',
+    'SignDrop is an offline document signer: upload a signature, drag it onto the document, and save. Your files never leave your computer.',
   'about.howto': 'How to use',
   'about.github': 'Source code on GitHub',
   'about.credits': 'Built with TAUSIK (AI-agent governance implementing SENAR v1.3).',

@@ -1,6 +1,6 @@
 # Развёртывание публичного демо
 
-Как запустить PDF Signer в режиме **stateless публичного демо** — версии, которой
+Как запустить SignDrop в режиме **stateless публичного демо** — версии, которой
 можно пользоваться без регистрации, где **ничего из загруженного не сохраняется
 на сервере**.
 
@@ -50,8 +50,8 @@
 ## Быстрый старт
 
 ```bash
-git clone https://github.com/TinaUma/PDF_Signer.git
-cd PDF_Signer
+git clone https://github.com/TinaUma/signdrop.git
+cd signdrop
 docker compose -f docker-compose.yml -f docker-compose.demo.yml up --build -d
 ```
 

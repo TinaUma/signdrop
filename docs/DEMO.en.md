@@ -1,6 +1,6 @@
 # Public Demo Deployment
 
-How to run PDF Signer as a **stateless public demo** — a deployment anyone can
+How to run SignDrop as a **stateless public demo** — a deployment anyone can
 use without registration, where **nothing they upload is stored on the server**.
 
 > Looking for the normal, persistent deployment? That's just `docker compose up`
@@ -51,8 +51,8 @@ expose this publicly.
 ## Quick start
 
 ```bash
-git clone https://github.com/TinaUma/PDF_Signer.git
-cd PDF_Signer
+git clone https://github.com/TinaUma/signdrop.git
+cd signdrop
 docker compose -f docker-compose.yml -f docker-compose.demo.yml up --build -d
 ```
 

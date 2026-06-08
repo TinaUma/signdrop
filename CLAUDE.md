@@ -122,6 +122,6 @@ Always respond in the user's language.
 
 <!-- DYNAMIC:START -->
 ## Current State
-Session: #6 (active) | Branch: multiple-fixes | Version: 1.4.0
-Tasks: 65/65 done, 0 active, 0 blocked
+Session: #7 (active) | Branch: main | Version: 1.3.7
+Tasks: 19/19 done, 0 active, 0 blocked
 <!-- DYNAMIC:END -->

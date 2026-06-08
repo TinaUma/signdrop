@@ -1,11 +1,11 @@
-# PDF Signer — Руководство разработчика (RU)
+# SignDrop — Руководство разработчика (RU)
 
 English version: [DEVELOPMENT.en.md](DEVELOPMENT.en.md)
 · ← [README](../README.md#русский) · [CHANGELOG](../CHANGELOG.md#русский)
 
 ## Обзор
 
-PDF Signer — офлайн-инструмент для наложения рукописной подписи на PDF и
+SignDrop — офлайн-инструмент для наложения рукописной подписи на PDF и
 изображения. Работает полностью локально: фронтенд на React + Konva общается с
 бэкендом FastAPI, который растрирует страницы, удаляет фон подписи и впечатывает
 подписи в итоговый файл. Оригинал документа не изменяется.
@@ -86,7 +86,7 @@ Form: `file`; `pages` (JSON); `delete_pages` (JSON-список индексов
 `page_too_large`, `image_too_large`, `no_pages_left` (все 422).
 
 ### `GET /health`
-Возвращает `{ "status": "ok", "service": "pdf-signer-api" }`.
+Возвращает `{ "status": "ok", "service": "signdrop-api" }`.
 
 ## Ключевое поведение
 
@@ -180,7 +180,7 @@ push в main и на pull request.
 
   Tauri почти не кросс-компилирует — собирайте инсталляторы каждой ОС **на этой
   же ОС** (или её CI-раннере). Для запуска «голого» бинарника держите
-  `pdf-signer` и `api-server` рядом: приложение запускает sidecar из своей папки.
+  `signdrop` и `api-server` рядом: приложение запускает sidecar из своей папки.
 
   CI (`release.yml`) собирает полный релиз под **Windows** при **мерже в main**:
   авто-тег `v<версия>` (из `package.json`, если версия поднята) и публикация

@@ -93,7 +93,7 @@ jobs:
           # runtime via the api_port Tauri command (src-tauri/src/lib.rs).
         with:
           tagName: ${{ needs.prepare.outputs.tag }}
-          releaseName: PDF Signer ${{ needs.prepare.outputs.tag }}
+          releaseName: SignDrop ${{ needs.prepare.outputs.tag }}
           releaseBody: "See CHANGELOG.md for details."
           releaseDraft: false
           prerelease: false
@@ -109,7 +109,7 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: pdf-signer-windows
+          name: signdrop-windows
           path: release/
 
   # Publish backend + frontend images to GHCR on the same tag.
@@ -137,8 +137,8 @@ jobs:
           context: ./backend
           push: true
           tags: |
-            ghcr.io/${{ steps.meta.outputs.owner }}/pdf-signer-backend:${{ needs.prepare.outputs.tag }}
-            ghcr.io/${{ steps.meta.outputs.owner }}/pdf-signer-backend:latest
+            ghcr.io/${{ steps.meta.outputs.owner }}/signdrop-backend:${{ needs.prepare.outputs.tag }}
+            ghcr.io/${{ steps.meta.outputs.owner }}/signdrop-backend:latest
 
       - name: Build & push frontend image
         uses: docker/build-push-action@v5
@@ -146,5 +146,5 @@ jobs:
           context: ./frontend
           push: true
           tags: |
-            ghcr.io/${{ steps.meta.outputs.owner }}/pdf-signer-frontend:${{ needs.prepare.outputs.tag }}
-            ghcr.io/${{ steps.meta.outputs.owner }}/pdf-signer-frontend:latest
+            ghcr.io/${{ steps.meta.outputs.owner }}/signdrop-frontend:${{ needs.prepare.outputs.tag }}
+            ghcr.io/${{ steps.meta.outputs.owner }}/signdrop-frontend:latest

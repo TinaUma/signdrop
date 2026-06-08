@@ -1,4 +1,4 @@
-# Документация PDF Signer · Documentation
+# Документация SignDrop · Documentation
 
 [Русский](#русский) · [English](#english)
 

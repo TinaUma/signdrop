@@ -1,16 +1,16 @@
 [package]
-name = "pdf-signer"
+name = "signdrop"
 version = "1.1.1"
-description = "PDF Signer — offline handwritten signature tool"
+description = "SignDrop — offline document signing tool"
 authors = ["TinaUma"]
 edition = "2021"
 
 [lib]
-name = "pdf_signer_lib"
+name = "signdrop_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [[bin]]
-name = "pdf-signer"
+name = "signdrop"
 path = "src/main.rs"
 
 [build-dependencies]

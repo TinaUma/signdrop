@@ -1,5 +1,5 @@
 export const ru = {
-  'app.title': 'PDF Signer',
+  'app.title': 'SignDrop',
   'app.signaturesTitle': 'Подписи',
   'app.removeBg': 'Удалить фон',
   'app.uploadSignature': '+ Загрузить подпись',
@@ -35,7 +35,7 @@ export const ru = {
   'about.close': 'Закрыть',
   'about.version': 'Версия',
   'about.description':
-    'PDF Signer — офлайн-подписание PDF и изображений: загрузите подпись, перетащите её на документ и сохраните. Файлы не покидают ваш компьютер.',
+    'SignDrop — офлайн-подписание документов и изображений: загрузите подпись, перетащите её на документ и сохраните. Файлы не покидают ваш компьютер.',
   'about.howto': 'Как пользоваться',
   'about.github': 'Исходный код на GitHub',
   'about.credits': 'Сделано с TAUSIK (управление AI-агентом, реализует SENAR v1.3).',

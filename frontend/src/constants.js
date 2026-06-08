@@ -7,7 +7,7 @@ export const APP_VERSION =
   typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'
 
 // Public source repository — linked from the About dialog.
-export const GITHUB_URL = 'https://github.com/TinaUma/PDF_Signer'
+export const GITHUB_URL = 'https://github.com/TinaUma/signdrop'
 
 // A4 @ ~96dpi — fallback stage size when a page's real pixel size is unknown.
 // Mirrors backend/constants.py (STAGE_FALLBACK_W/H); keep both in sync.

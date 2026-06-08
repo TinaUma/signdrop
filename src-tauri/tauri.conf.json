@@ -1,7 +1,7 @@
 {
-  "productName": "PDF Signer",
+  "productName": "SignDrop",
   "version": "1.1.1",
-  "identifier": "com.tinauuma.pdfsigner",
+  "identifier": "com.tinauuma.signdrop",
   "build": {
     "frontendDist": "../frontend/dist",
     "devUrl": "http://localhost:5173",
@@ -12,7 +12,7 @@
     "withGlobalTauri": false,
     "windows": [
       {
-        "title": "PDF Signer",
+        "title": "SignDrop",
         "width": 1280,
         "height": 800,
         "resizable": true,

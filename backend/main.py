@@ -8,7 +8,7 @@ from api.signatures import router as signatures_router
 from api.history import router as history_router
 from constants import APP_VERSION, cors_extra_origins
 
-app = FastAPI(title="PDF Signer API", version=APP_VERSION)
+app = FastAPI(title="SignDrop API", version=APP_VERSION)
 
 # The browser deployment talks to the API same-origin through the nginx proxy,
 # so CORS is only needed for the dev server and the Tauri webview. Restrict to
@@ -52,7 +52,7 @@ app.include_router(history_router)
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "pdf-signer-api"}
+    return {"status": "ok", "service": "signdrop-api"}
 
 
 if __name__ == "__main__":

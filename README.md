@@ -1,11 +1,11 @@
 <div align="center">
 
-# PDF Signer
+# SignDrop
 
 **Инструмент для наложения рукописной подписи на документы**  
 **A tool for placing handwritten signatures on documents**
 
-[![Status](https://img.shields.io/badge/version-1.1.0-brightgreen)](https://github.com/TinaUma/PDF_Signer)
+[![Status](https://img.shields.io/badge/version-1.1.1-brightgreen)](https://github.com/TinaUma/signdrop)
 [![Python](https://img.shields.io/badge/python-3.11-blue?logo=python&logoColor=white)](https://python.org)
 [![React](https://img.shields.io/badge/react-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
@@ -24,7 +24,7 @@
 
 ### Что это
 
-PDF Signer — инструмент для наложения рукописной подписи (скан или фото) на документы PDF, JPEG, PNG. Работает **полностью локально** — никакие данные не покидают устройство. Без облаков, без регистрации.
+SignDrop — инструмент для наложения рукописной подписи (скан или фото) на документы PDF, JPEG, PNG. Работает **полностью локально** — никакие данные не покидают устройство. Без облаков, без регистрации.
 
 > Запустил → открыл файл → перетащил подпись → сохранил.
 
@@ -67,8 +67,8 @@ PDF Signer — инструмент для наложения рукописно
 **Требования:** Docker Desktop
 
 ```bash
-git clone https://github.com/TinaUma/PDF_Signer.git
-cd PDF_Signer
+git clone https://github.com/TinaUma/signdrop.git
+cd signdrop
 docker compose up
 ```
 
@@ -136,7 +136,7 @@ AI-ассистент: [Claude Code](https://claude.ai/code) by Anthropic
 
 ### What is it
 
-PDF Signer is a tool for placing a handwritten signature (scan or photo) onto PDF and image documents. Works **completely offline** — no data ever leaves your device. No cloud, no registration.
+SignDrop is a tool for placing a handwritten signature (scan or photo) onto PDF and image documents. Works **completely offline** — no data ever leaves your device. No cloud, no registration.
 
 > Launch → open file → drag your signature → save.
 
@@ -179,8 +179,8 @@ PDF Signer is a tool for placing a handwritten signature (scan or photo) onto PD
 **Requirements:** Docker Desktop
 
 ```bash
-git clone https://github.com/TinaUma/PDF_Signer.git
-cd PDF_Signer
+git clone https://github.com/TinaUma/signdrop.git
+cd signdrop
 docker compose up
 ```
 

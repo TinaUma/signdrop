@@ -43,7 +43,7 @@ export function I18nProvider({ children }) {
   // Reflect the active language on the document (a11y/SEO) and localize the title.
   useEffect(() => {
     document.documentElement.lang = lang
-    document.title = CATALOGS[lang]?.['app.title'] ?? 'PDF Signer'
+    document.title = CATALOGS[lang]?.['app.title'] ?? 'SignDrop'
   }, [lang])
 
   const value = useMemo(
