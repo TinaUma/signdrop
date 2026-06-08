@@ -12,6 +12,9 @@ permissions:
   contents: write
   packages: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -86,7 +89,7 @@ jobs:
       # so there is no icon-generation step here — tauri-action uses them as-is.
 
       - name: Build Tauri app & publish release
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v0.6.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # No VITE_API_BASE: the webview discovers the sidecar's dynamic port at
