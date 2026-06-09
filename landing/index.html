@@ -12,6 +12,26 @@
     #__bundler_placeholder { color: #999; font-size: 14px; }
     #__bundler_err { display: none !important; }
   </style>
+  <script>
+    window.addEventListener('load', function() {
+      function patchDonationLinks() {
+        var patched = 0;
+        document.querySelectorAll('a').forEach(function(a) {
+          var txt = a.textContent;
+          if (txt.indexOf('Ko-fi') >= 0 || txt.indexOf('Ko-Fi') >= 0) {
+            a.href = 'https://pay.cloudtips.ru/p/ea5537e6';
+            a.target = '_blank'; a.rel = 'noopener noreferrer'; patched++;
+          }
+          if (txt.indexOf('ЮМoney') >= 0 || txt.indexOf('ЮМан') >= 0 || txt.indexOf('YuMoney') >= 0) {
+            a.href = 'https://yoomoney.ru/to/4100119540100972';
+            a.target = '_blank'; a.rel = 'noopener noreferrer'; patched++;
+          }
+        });
+        return patched;
+      }
+      if (!patchDonationLinks()) setTimeout(patchDonationLinks, 2000);
+    });
+  </script>
   <noscript>
     <style>#__bundler_loading { display: none; }</style>
     <div style="position:fixed;bottom:12px;left:12px;font:13px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;color:#999;background:rgba(255,255,255,0.9);padding:6px 12px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);z-index:10000;">
