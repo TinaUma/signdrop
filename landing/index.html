@@ -17,6 +17,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SignDrop — Подпишите любой документ локально, бесплатно, без регистрации</title>
   <meta name="description" content="SignDrop — бесплатный офлайн-инструмент для подписания PDF и изображений. Без регистрации, без облака, без слежки. Работает в браузере и как нативное приложение для Windows.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="canonical" href="https://signdrop.site/">
   <meta name="yandex-verification" content="df145cca57c3633c">
 
@@ -83,12 +84,12 @@
             a.target = '_blank'; a.rel = 'noopener noreferrer';
           }
 
-          // YooMoney — all possible spellings
-          if (txt.indexOf('ЮМoney') >= 0 || txt.indexOf('ЮМан') >= 0 ||
-              txt.indexOf('Юман') >= 0 || txt.indexOf('YuMoney') >= 0 ||
-              txt.indexOf('YooMoney') >= 0 || txt.indexOf('Ю.Money') >= 0 ||
-              txt.indexOf('ЮМАНИ') >= 0 || txt.toLowerCase().indexOf('юмани') >= 0 ||
-              txt.toLowerCase().indexOf('юмoney') >= 0 || txt.toLowerCase().indexOf('yoomoney') >= 0) {
+          // YooMoney — all spelling variants (Cyrillic Ю + Latin or Cyrillic M)
+          if (txt.indexOf('ЮMoney') >= 0 || txt.indexOf('ЮМoney') >= 0 ||
+              txt.indexOf('ЮМан') >= 0 || txt.indexOf('Юман') >= 0 ||
+              txt.indexOf('YuMoney') >= 0 || txt.indexOf('YooMoney') >= 0 ||
+              txt.indexOf('Ю.Money') >= 0 || txt.indexOf('ЮМАНИ') >= 0 ||
+              txt.toLowerCase().indexOf('юмани') >= 0 || txt.toLowerCase().indexOf('yoomoney') >= 0) {
             a.href = 'https://yoomoney.ru/to/4100119540100972';
             a.target = '_blank'; a.rel = 'noopener noreferrer';
           }
