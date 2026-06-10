@@ -72,22 +72,38 @@
   </style>
   <script>
     window.addEventListener('load', function() {
-      function patchDonationLinks() {
-        var patched = 0;
+      function patchLinks() {
         document.querySelectorAll('a').forEach(function(a) {
-          var txt = a.textContent;
-          if (txt.indexOf('Ko-fi') >= 0 || txt.indexOf('Ko-Fi') >= 0) {
+          var txt = a.textContent.trim();
+          var href = (a.getAttribute('href') || '').toLowerCase();
+
+          // CloudTips (was Ko-fi)
+          if (txt.indexOf('Ko-fi') >= 0 || txt.indexOf('Ko-Fi') >= 0 || txt.indexOf('Kofi') >= 0) {
             a.href = 'https://pay.cloudtips.ru/p/ea5537e6';
-            a.target = '_blank'; a.rel = 'noopener noreferrer'; patched++;
+            a.target = '_blank'; a.rel = 'noopener noreferrer';
           }
-          if (txt.indexOf('ЮМoney') >= 0 || txt.indexOf('ЮМан') >= 0 || txt.indexOf('YuMoney') >= 0) {
+
+          // YooMoney — all possible spellings
+          if (txt.indexOf('ЮМoney') >= 0 || txt.indexOf('ЮМан') >= 0 ||
+              txt.indexOf('Юман') >= 0 || txt.indexOf('YuMoney') >= 0 ||
+              txt.indexOf('YooMoney') >= 0 || txt.indexOf('Ю.Money') >= 0 ||
+              txt.indexOf('ЮМАНИ') >= 0 || txt.toLowerCase().indexOf('юмани') >= 0 ||
+              txt.toLowerCase().indexOf('юмoney') >= 0 || txt.toLowerCase().indexOf('yoomoney') >= 0) {
             a.href = 'https://yoomoney.ru/to/4100119540100972';
-            a.target = '_blank'; a.rel = 'noopener noreferrer'; patched++;
+            a.target = '_blank'; a.rel = 'noopener noreferrer';
+          }
+
+          // Docker button — fix broken/empty links near Docker text
+          if ((txt.toLowerCase().indexOf('docker') >= 0 || txt.indexOf('Docker') >= 0) &&
+              (!a.href || href === '#' || href === '' || href === window.location.href.toLowerCase())) {
+            a.href = 'https://github.com/TinaUma/signdrop#docker';
+            a.target = '_blank'; a.rel = 'noopener noreferrer';
           }
         });
-        return patched;
       }
-      if (!patchDonationLinks()) setTimeout(patchDonationLinks, 2000);
+      patchLinks();
+      setTimeout(patchLinks, 1500);
+      setTimeout(patchLinks, 4000);
     });
   </script>
   <noscript>
