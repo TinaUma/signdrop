@@ -123,6 +123,5 @@ Always respond in the user's language.
 <!-- DYNAMIC:START -->
 ## Current State
 Session: #9 (active) | Branch: main | Version: 1.4.0
-Tasks: 24/25 done, 1 active, 0 blocked
-Active: update-readme-full-feature-list-split-ru-en-files
+Tasks: 29/29 done, 0 active, 0 blocked
 <!-- DYNAMIC:END -->
