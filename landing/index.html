@@ -61,9 +61,27 @@
         }
       }, true);
 
+      function patchText() {
+        // Как -> Идея in nav
+        document.querySelectorAll('.sd-header-nav a, nav a').forEach(function(a) {
+          if (a.textContent.trim() === 'Как') {
+            a.textContent = 'Идея';
+          }
+        });
+
+        // Ko-fi -> CloudTips button text
+        document.querySelectorAll('a, button').forEach(function(el) {
+          var txt = el.textContent.trim();
+          if (txt === 'Ko-fi' || txt === 'Ko-Fi' || txt === 'Kofi') {
+            el.textContent = 'CloudTips';
+          }
+        });
+      }
+
       patchLinks();
-      setTimeout(patchLinks, 1500);
-      setTimeout(patchLinks, 4000);
+      patchText();
+      setTimeout(function(){ patchLinks(); patchText(); }, 1500);
+      setTimeout(function(){ patchLinks(); patchText(); }, 4000);
     });
   </script>
   <meta charset="utf-8">
