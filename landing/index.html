@@ -71,6 +71,13 @@
             a.target = "_blank"; a.rel = "noopener noreferrer";
           }
 
+          if (txt.indexOf("\u042e\u041c\u043e\u043d\u0435\u0439") >= 0 ||
+              txt.indexOf("YooMoney") >= 0 || txt.indexOf("Yoomoney") >= 0 ||
+              (href && href.indexOf("yoomoney") >= 0 && href.indexOf("yoomoney.ru/to") < 0)) {
+            a.href = "https://yoomoney.ru/to/4100119540100972";
+            a.target = "_blank"; a.rel = "noopener noreferrer";
+          }
+
           if ((txt === "GitHub" || txt === "GitHub \u2197") && (!href || href === "#")) {
             a.href = "https://github.com/TinaUma/signdrop";
             a.target = "_blank"; a.rel = "noopener noreferrer";
