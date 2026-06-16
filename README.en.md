@@ -33,9 +33,9 @@ SignDrop is a tool for placing a handwritten signature (scan or photo) onto PDF 
 
 *Signature and handwritten text placed on the document — fully local, no cloud*
 
-![Signature history](screenshots/02-signature-history.png)
+![Signing history](screenshots/02-signature-history.png)
 
-*Signature history dialog — quickly reuse previously uploaded signatures*
+*Signing history — list of documents you have already signed*
 
 ![Handwritten text with color picker](screenshots/03-handwriting-text.png)
 
@@ -43,7 +43,7 @@ SignDrop is a tool for placing a handwritten signature (scan or photo) onto PDF 
 
 ![Multi-page document](screenshots/04-multipage.png)
 
-*Page navigation — sign any page of a multi-page PDF*
+*"Apply to all pages" — signature appears on every page instantly. "Exclude page" — skip the cover page, for example*
 
 </div>
 
