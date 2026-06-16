@@ -29,9 +29,9 @@ SignDrop is a tool for placing a handwritten signature (scan or photo) onto PDF 
 
 <div align="center">
 
-![Interface — document with signature and handwritten text](screenshots/01-interface.png)
+![Interface — placing a signature on a document](screenshots/01-interface.png)
 
-*Signature and handwritten text placed on the document — fully local, no cloud*
+*Signature can be placed anywhere on the document — scale, rotate, resize, adjust opacity. Signature library for reuse. Fully local, no cloud.*
 
 ![Signing history](screenshots/02-signature-history.png)
 
