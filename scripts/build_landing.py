@@ -75,9 +75,14 @@ PATCH = """\
             a.target = "_blank"; a.rel = "noopener noreferrer";
           }
 
-          if (txt.indexOf("\\u042e\\u041c\\u043e\\u043d\\u0435\\u0439") >= 0 ||
-              txt.indexOf("YooMoney") >= 0 || txt.indexOf("Yoomoney") >= 0 ||
-              (href && href.indexOf("yoomoney") >= 0 && href.indexOf("yoomoney.ru/to") < 0)) {
+          // YooMoney — mixed Cyrillic+Latin spelling: Ю (U+042E) + Latin "Money"
+          var txtLow = txt.toLowerCase();
+          if (txt.indexOf("\\u042eMoney") >= 0 || txt.indexOf("\\u042e\\u041coney") >= 0 ||
+              txt.indexOf("\\u042e\\u041c\\u043e\\u043d\\u0435\\u0439") >= 0 ||
+              txt.indexOf("YooMoney") >= 0 || txt.indexOf("YuMoney") >= 0 ||
+              txtLow.indexOf("\\u044emoney") >= 0 ||
+              txtLow.indexOf("\\u044e\\u043c\\u0430\\u043d\\u0438") >= 0 ||
+              txtLow.indexOf("yoomoney") >= 0) {
             a.href = "https://yoomoney.ru/to/4100119540100972";
             a.target = "_blank"; a.rel = "noopener noreferrer";
           }
