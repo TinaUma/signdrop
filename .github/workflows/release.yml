@@ -162,6 +162,7 @@ jobs:
           releaseBody: "See CHANGELOG.md for details."
           releaseDraft: false
           prerelease: false
+          args: "--bundles dmg"
 
       - name: Collect artifacts
         run: |
@@ -230,6 +231,7 @@ jobs:
           releaseBody: "See CHANGELOG.md for details."
           releaseDraft: false
           prerelease: false
+          args: "--bundles deb,appimage"
 
       - name: Collect artifacts
         run: |
