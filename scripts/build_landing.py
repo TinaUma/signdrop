@@ -102,6 +102,14 @@ PATCH = """\
             a.target = "_blank"; a.rel = "noopener noreferrer";
           }
 
+          // "Попробовать онлайн" / "Try Online" — live demo button (hero + footer)
+          var txtLowTry = txt.toLowerCase();
+          if (txtLowTry.indexOf("\\u043f\\u043e\\u043f\\u0440\\u043e\\u0431\\u043e\\u0432\\u0430\\u0442\\u044c") >= 0 ||
+              txtLowTry.indexOf("try") >= 0 || txtLowTry.indexOf("online") >= 0) {
+            a.href = "https://signdrop.tinacodes.space/";
+            a.target = "_blank"; a.rel = "noopener noreferrer";
+          }
+
           // Mac download button — arm64 .dmg (v1.1.2)
           // href check intentionally omitted: override even if button already has a releases-page URL
           var txtLowFull = txt.toLowerCase();
