@@ -61,3 +61,6 @@ release-build.log
 
 # Claude Design exports (source files, не деплоим напрямую)
 SignDrop-standalone.html
+
+# VPS deployment reference — содержит SSH-ключи, не коммитить НИКОГДА
+CI.md
