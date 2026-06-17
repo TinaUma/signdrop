@@ -102,6 +102,22 @@ PATCH = """\
             a.target = "_blank"; a.rel = "noopener noreferrer";
           }
 
+          // Mac download button — arm64 .dmg (v1.1.2)
+          var txtLowFull = txt.toLowerCase();
+          if (txt.length < 80 && (!href || href === "#" || href === "") &&
+              (txtLowFull.indexOf("mac") >= 0 || txtLowFull.indexOf("apple") >= 0 ||
+               txtLowFull.indexOf("dmg") >= 0)) {
+            a.href = "https://github.com/TinaUma/signdrop/releases/download/v1.1.2/SignDrop_1.1.2_aarch64.dmg";
+            a.target = "_blank"; a.rel = "noopener noreferrer";
+          }
+
+          // Linux download button — .deb (v1.1.2)
+          if (txt.length < 80 && (!href || href === "#" || href === "") &&
+              txtLowFull.indexOf("linux") >= 0) {
+            a.href = "https://github.com/TinaUma/signdrop/releases/download/v1.1.2/SignDrop_1.1.2_amd64.deb";
+            a.target = "_blank"; a.rel = "noopener noreferrer";
+          }
+
           if ((txt.indexOf("\\u041f\\u043e\\u043b\\u0438\\u0442\\u0438\\u043a\\u0430") >= 0 ||
                txt.indexOf("\\u043a\\u043e\\u043d\\u0444\\u0438\\u0434\\u0435\\u043d\\u0446\\u0438\\u0430\\u043b\\u044c\\u043d\\u043e\\u0441\\u0442\\u0438") >= 0) &&
               (!href || href === "#")) {
@@ -225,6 +241,8 @@ checks = [
     "cloudtips",
     "privacy.html",
     "terms.html",
+    "aarch64.dmg",
+    "amd64.deb",
 ]
 for c in checks:
     status = "OK" if c.lower() in new_content.lower() else "MISSING"
