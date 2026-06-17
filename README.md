@@ -4,7 +4,7 @@
 
 **Инструмент для наложения рукописной подписи на документы**
 
-[![Status](https://img.shields.io/badge/version-1.1.1-brightgreen)](https://github.com/TinaUma/signdrop/releases)
+[![Status](https://img.shields.io/badge/version-1.1.2-brightgreen)](https://github.com/TinaUma/signdrop/releases)
 [![Windows](https://img.shields.io/badge/Windows-.exe%20%2F%20.msi-0078D4?logo=windows&logoColor=white)](https://github.com/TinaUma/signdrop/releases)
 [![Python](https://img.shields.io/badge/python-3.11-blue?logo=python&logoColor=white)](https://python.org)
 [![React](https://img.shields.io/badge/react-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
@@ -99,7 +99,7 @@ docker compose up
 
 Открыть в браузере: **http://localhost:8080**
 
-> 🌐 **Живое демо:** [https://tinacodes.space](https://tinacodes.space)  
+> 🌐 **Живое демо:** [https://signdrop.tinacodes.space](https://signdrop.tinacodes.space)  
 > 🏠 **Сайт проекта:** [https://signdrop.site](https://signdrop.site)
 
 Подписи сохраняются в `./data/signatures/` и не пропадают между перезапусками.
