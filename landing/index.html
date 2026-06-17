@@ -99,8 +99,9 @@
           }
 
           // Mac download button — arm64 .dmg (v1.1.2)
+          // href check intentionally omitted: override even if button already has a releases-page URL
           var txtLowFull = txt.toLowerCase();
-          if (txt.length < 80 && (!href || href === "#" || href === "") &&
+          if (txt.length < 80 &&
               (txtLowFull.indexOf("mac") >= 0 || txtLowFull.indexOf("apple") >= 0 ||
                txtLowFull.indexOf("dmg") >= 0)) {
             a.href = "https://github.com/TinaUma/signdrop/releases/download/v1.1.2/SignDrop_1.1.2_aarch64.dmg";
@@ -108,8 +109,8 @@
           }
 
           // Linux download button — .deb (v1.1.2)
-          if (txt.length < 80 && (!href || href === "#" || href === "") &&
-              txtLowFull.indexOf("linux") >= 0) {
+          // href check intentionally omitted: override even if button already has a releases-page URL
+          if (txt.length < 80 && txtLowFull.indexOf("linux") >= 0) {
             a.href = "https://github.com/TinaUma/signdrop/releases/download/v1.1.2/SignDrop_1.1.2_amd64.deb";
             a.target = "_blank"; a.rel = "noopener noreferrer";
           }
