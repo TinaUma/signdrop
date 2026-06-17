@@ -1,6 +1,6 @@
 [package]
 name = "signdrop"
-version = "1.1.1"
+version = "1.1.2"
 description = "SignDrop — offline document signing tool"
 authors = ["TinaUma"]
 edition = "2021"
