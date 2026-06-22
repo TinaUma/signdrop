@@ -250,9 +250,9 @@ PATCH = """\
         var detected = isWin ? "win" : isMac ? "mac" : isLinux ? "linux" : "win";
 
         var headerBtn = null;
-        document.querySelectorAll(".sd-header a, header a, .sd-header button, header button").forEach(function(el) {
+        document.querySelectorAll("a, button").forEach(function(el) {
           var txt = el.textContent.trim();
-          if (txt.indexOf("\\u0421\\u043a\\u0430\\u0447\\u0430\\u0442\\u044c") >= 0 && txt.length < 60) {
+          if (txt.indexOf("\\u0421\\u043a\\u0430\\u0447\\u0430\\u0442\\u044c \\u0434\\u043b\\u044f Windows") >= 0 && txt.length < 60) {
             headerBtn = el;
           }
         });
