@@ -63,7 +63,7 @@ if __name__ == "__main__":
     import uvicorn
 
     # The Tauri shell picks a free port at startup and passes it via
-    # PDF_SIGNER_PORT (hardcoding 8000 broke the app when that port was taken).
+    # SIGNDROP_PORT (hardcoding 8000 broke the app when that port was taken).
     # Default to 8000 for the Docker/standalone run where the port is fixed.
-    port = int(os.environ.get("PDF_SIGNER_PORT", "8000"))
+    port = int(os.environ.get("SIGNDROP_PORT", "8000"))
     uvicorn.run(app, host="127.0.0.1", port=port)

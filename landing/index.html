@@ -214,12 +214,87 @@
         }
       }
 
+      function patchFooterCopyright() {
+        document.querySelectorAll("footer *").forEach(function(el) {
+          if (el.children.length > 0) return;
+          var txt = el.textContent || "";
+          if (txt.indexOf("TAUSIK Core") < 0) return;
+          el.innerHTML = el.innerHTML
+            .replace("TAUSIK Core", '<a href="https://github.com/Kibertum/tausik-core" target="_blank" rel="noopener noreferrer">TAUSIK Core</a>')
+            .replace("\u041b\u0438\u0446\u0435\u043d\u0437\u0438\u044f MIT", '<a href="https://github.com/TinaUma/signdrop/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">\u041b\u0438\u0446\u0435\u043d\u0437\u0438\u044f MIT</a>');
+        });
+      }
+
+      function patchPlatformDownload() {
+        var ua = navigator.userAgent.toLowerCase();
+        var isWin = ua.indexOf("windows") >= 0;
+        var isMac = (ua.indexOf("mac os") >= 0 || ua.indexOf("macintosh") >= 0) &&
+                    ua.indexOf("iphone") < 0 && ua.indexOf("ipad") < 0;
+        var isAndroid = ua.indexOf("android") >= 0;
+        var isIOS = /iphone|ipad|ipod/.test(ua);
+        var isLinux = ua.indexOf("linux") >= 0 && !isAndroid;
+        var isMobile = isAndroid || isIOS;
+
+        var platforms = {
+          win:   { text: "\u0421\u043a\u0430\u0447\u0430\u0442\u044c \u0434\u043b\u044f Windows",
+                   href: "https://github.com/TinaUma/signdrop/releases/download/v1.1.2/SignDrop_1.1.2_x64-setup.exe" },
+          mac:   { text: "\u0421\u043a\u0430\u0447\u0430\u0442\u044c \u0434\u043b\u044f Mac",
+                   href: "https://github.com/TinaUma/signdrop/releases/download/v1.1.2/SignDrop_1.1.2_aarch64.dmg" },
+          linux: { text: "\u0421\u043a\u0430\u0447\u0430\u0442\u044c \u0434\u043b\u044f Linux",
+                   href: "https://github.com/TinaUma/signdrop/releases/download/v1.1.2/SignDrop_1.1.2_amd64.deb" }
+        };
+        var detected = isWin ? "win" : isMac ? "mac" : isLinux ? "linux" : "win";
+
+        var headerBtn = null;
+        document.querySelectorAll(".sd-header a, header a, .sd-header button, header button").forEach(function(el) {
+          var txt = el.textContent.trim();
+          if (txt.indexOf("\u0421\u043a\u0430\u0447\u0430\u0442\u044c") >= 0 && txt.length < 60) {
+            headerBtn = el;
+          }
+        });
+        if (!headerBtn) return;
+
+        if (isMobile) {
+          var msg = document.createElement("span");
+          msg.textContent = "\u0422\u043e\u043b\u044c\u043a\u043e \u0434\u043b\u044f \u041f\u041a";
+          msg.style.cssText = "color:rgba(255,255,255,0.5);font-size:0.85rem;";
+          headerBtn.parentNode.replaceChild(msg, headerBtn);
+          return;
+        }
+
+        var p = platforms[detected];
+        headerBtn.textContent = p.text;
+        headerBtn.href = p.href;
+        headerBtn.target = "_blank";
+        headerBtn.rel = "noopener noreferrer";
+
+        if (!headerBtn.parentNode.querySelector(".sd-all-platforms")) {
+          var allLink = document.createElement("a");
+          allLink.className = "sd-all-platforms";
+          allLink.textContent = "\u0412\u0441\u0435 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u044b \u2193";
+          allLink.href = "#";
+          allLink.style.cssText = "display:block;color:rgba(255,255,255,0.5);font-size:0.78rem;text-align:center;margin-top:4px;text-decoration:none;cursor:pointer;";
+          allLink.addEventListener("click", function(e) {
+            e.preventDefault();
+            var nodes = Array.from(document.querySelectorAll("div,section,article"));
+            var dlSection = findSmallest(nodes,
+              ["\u0421\u043a\u0430\u0447\u0430\u0442\u044c \u0434\u043b\u044f Windows",
+               "\u0421\u043a\u0430\u0447\u0430\u0442\u044c \u0434\u043b\u044f Mac"],
+              [], 5000);
+            if (dlSection) dlSection.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+          headerBtn.parentNode.appendChild(allLink);
+        }
+      }
+
       initCookieBanner();
       patchLinks();
       patchText();
       patchLayout();
-      setTimeout(function(){ initCookieBanner(); patchLinks(); patchText(); patchLayout(); }, 1500);
-      setTimeout(function(){ initCookieBanner(); patchLinks(); patchText(); patchLayout(); }, 4000);
+      patchFooterCopyright();
+      patchPlatformDownload();
+      setTimeout(function(){ initCookieBanner(); patchLinks(); patchText(); patchLayout(); patchFooterCopyright(); patchPlatformDownload(); }, 1500);
+      setTimeout(function(){ initCookieBanner(); patchLinks(); patchText(); patchLayout(); patchFooterCopyright(); patchPlatformDownload(); }, 4000);
     });
   </script>
   <title>SignDrop — Подпишите любой документ локально, бесплатно, без регистрации</title>

@@ -106,7 +106,7 @@ pub fn run() {
             // continue so the window still opens with a clear error path.
             match app.shell().sidecar("api-server") {
                 Ok(sidecar) => {
-                    let mut sidecar = sidecar.env("PDF_SIGNER_PORT", port.to_string());
+                    let mut sidecar = sidecar.env("SIGNDROP_PORT", port.to_string());
                     if let Some(ref d) = data_dir {
                         sidecar = sidecar.env("DATA_DIR", d.to_string_lossy().to_string());
                     }

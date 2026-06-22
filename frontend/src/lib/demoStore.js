@@ -7,7 +7,7 @@
 //   history:    { id, filename, ext, page_count, originalBlob, resultBlob,
 //                 pages, delete_pages, created_at }
 
-const DB_NAME = 'pdf-signer-demo'
+const DB_NAME = 'signdrop-demo'
 const DB_VERSION = 1
 const SIG_STORE = 'signatures'
 const HIST_STORE = 'history'

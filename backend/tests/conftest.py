@@ -1,4 +1,4 @@
-"""Shared pytest fixtures for the PDF Signer backend.
+"""Shared pytest fixtures for the SignDrop backend.
 
 DATA_DIR side effects are redirected to a per-test tmp directory so tests never
 touch the real ./data volume. Both get_signatures_dir() and pdf_writer.save_output
