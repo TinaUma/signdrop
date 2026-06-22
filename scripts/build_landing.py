@@ -273,21 +273,19 @@ PATCH = """\
         headerBtn.rel = "noopener noreferrer";
 
         if (!headerBtn.parentNode.querySelector(".sd-all-platforms")) {
+          var wrapper = document.createElement("div");
+          wrapper.style.cssText = "display:inline-flex;flex-direction:column;align-items:center;gap:5px;";
+          headerBtn.parentNode.insertBefore(wrapper, headerBtn);
+          wrapper.appendChild(headerBtn);
+
           var allLink = document.createElement("a");
           allLink.className = "sd-all-platforms";
-          allLink.textContent = "\\u0412\\u0441\\u0435 \\u043f\\u043b\\u0430\\u0442\\u0444\\u043e\\u0440\\u043c\\u044b \\u2193";
-          allLink.href = "#";
-          allLink.style.cssText = "display:block;color:rgba(255,255,255,0.5);font-size:0.78rem;text-align:center;margin-top:4px;text-decoration:none;cursor:pointer;";
-          allLink.addEventListener("click", function(e) {
-            e.preventDefault();
-            var nodes = Array.from(document.querySelectorAll("div,section,article"));
-            var dlSection = findSmallest(nodes,
-              ["\\u0421\\u043a\\u0430\\u0447\\u0430\\u0442\\u044c \\u0434\\u043b\\u044f Windows",
-               "\\u0421\\u043a\\u0430\\u0447\\u0430\\u0442\\u044c \\u0434\\u043b\\u044f Mac"],
-              [], 5000);
-            if (dlSection) dlSection.scrollIntoView({ behavior: "smooth", block: "start" });
-          });
-          headerBtn.parentNode.appendChild(allLink);
+          allLink.textContent = "\\u0412\\u0441\\u0435 \\u043f\\u043b\\u0430\\u0442\\u0444\\u043e\\u0440\\u043c\\u044b \\u2192";
+          allLink.href = "https://github.com/TinaUma/signdrop/releases";
+          allLink.target = "_blank";
+          allLink.rel = "noopener noreferrer";
+          allLink.style.cssText = "color:rgba(255,255,255,0.55);font-size:0.8rem;font-family:inherit;text-decoration:none;letter-spacing:0.02em;";
+          wrapper.appendChild(allLink);
         }
       }
 
