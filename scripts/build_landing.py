@@ -273,14 +273,43 @@ PATCH = """\
         headerBtn.rel = "noopener noreferrer";
 
         if (!document.querySelector(".sd-all-platforms")) {
+          var wrapper = document.createElement("div");
+          wrapper.style.cssText = "display:inline-flex;flex-direction:column;align-items:center;gap:6px;";
+          headerBtn.parentNode.insertBefore(wrapper, headerBtn);
+          wrapper.appendChild(headerBtn);
+
           var allLink = document.createElement("a");
           allLink.className = "sd-all-platforms";
-          allLink.textContent = "\\u0412\\u0441\\u0435 \\u043f\\u043b\\u0430\\u0442\\u0444\\u043e\\u0440\\u043c\\u044b \\u2192";
-          allLink.href = "https://github.com/TinaUma/signdrop/releases";
-          allLink.target = "_blank";
-          allLink.rel = "noopener noreferrer";
-          allLink.style.cssText = "display:block;text-align:center;color:rgba(255,255,255,0.55);font-size:0.8rem;font-family:inherit;text-decoration:none;letter-spacing:0.02em;margin-top:2px;";
-          headerBtn.parentNode.insertBefore(allLink, headerBtn.nextSibling);
+          allLink.textContent = "\\u0412\\u0441\\u0435 \\u043f\\u043b\\u0430\\u0442\\u0444\\u043e\\u0440\\u043c\\u044b \\u2193";
+          allLink.href = "#";
+          allLink.style.cssText = "color:rgba(255,255,255,0.55);font-size:0.78rem;font-family:inherit;text-decoration:none;letter-spacing:0.02em;cursor:pointer;";
+          allLink.addEventListener("click", function(e) {
+            e.preventDefault();
+            var found = false;
+            document.querySelectorAll("nav a, header a").forEach(function(a) {
+              if (found) return;
+              if (a.textContent.trim().indexOf("\\u041b\\u043e\\u043a\\u0430\\u043b\\u044c\\u043d\\u043e") >= 0) {
+                var href = a.getAttribute("href");
+                if (href && href.charAt(0) === "#") {
+                  var target = document.querySelector(href);
+                  if (target) { target.scrollIntoView({behavior:"smooth"}); found = true; return; }
+                }
+                a.click(); found = true;
+              }
+            });
+            if (found) return;
+            var best = null, bestLen = 999999;
+            document.querySelectorAll("section, article, main > div").forEach(function(s) {
+              var t = s.textContent;
+              if (t.indexOf("Windows") >= 0 && t.indexOf("Linux") >= 0 &&
+                  t.indexOf("Mac") >= 0 && t.length < bestLen) {
+                best = s; bestLen = t.length;
+              }
+            });
+            if (best) { best.scrollIntoView({behavior:"smooth"}); return; }
+            window.open("https://github.com/TinaUma/signdrop/releases", "_blank");
+          });
+          wrapper.appendChild(allLink);
         }
       }
 
