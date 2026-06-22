@@ -129,7 +129,9 @@ window.SD = {
       linkSupport: "Поддержать",
       docPrivacy: "Политика конфиденциальности",
       docTerms: "Пользовательское соглашение",
-      copyright: "© 2026 SignDrop · Сделано с помощью TAUSIK Core · Лицензия MIT · v1.1.2",
+      copyright: "© 2026 SignDrop",
+      madeWith: "Сделано с помощью",
+      licLabel: "Лицензия MIT",
     },
     cookie: {
       text: "Мы используем Яндекс.Метрику для анализа посещаемости.",
@@ -267,7 +269,9 @@ window.SD = {
       linkSupport: "Support",
       docPrivacy: "Privacy Policy",
       docTerms: "Terms of Service",
-      copyright: "© 2026 SignDrop · Made with TAUSIK Core · MIT License · v1.1.2",
+      copyright: "© 2026 SignDrop",
+      madeWith: "Made with",
+      licLabel: "MIT License",
     },
     cookie: {
       text: "We use Yandex.Metrica to analyze site traffic.",

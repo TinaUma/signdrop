@@ -492,7 +492,7 @@ function Footer({ t }) {
         </div>
       </div>
       <div style={{ maxWidth: 1240, margin: "36px auto 0", paddingTop: 18, borderTop: "1px solid rgba(255,255,255,0.1)", fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: 0.8, opacity: 0.45 }}>
-        {d.copyright}
+        {d.copyright} · {d.madeWith} <a href="https://github.com/Kibertum/tausik-core" target="_blank" rel="noopener" style={{ color: "inherit" }}>TAUSIK Core</a> · <a href="https://github.com/TinaUma/signdrop/blob/main/LICENSE" target="_blank" rel="noopener" style={{ color: "inherit" }}>{d.licLabel}</a> · v1.1.2
       </div>
     </footer>
   );
