@@ -102,6 +102,12 @@ PATCH = """\
             a.target = "_blank"; a.rel = "noopener noreferrer";
           }
 
+          // "Все платформы" / "All platforms" — scroll to #download section
+          if (txt.indexOf("\\u0412\\u0441\\u0435 \\u043f\\u043b\\u0430\\u0442\\u0444\\u043e\\u0440\\u043c\\u044b") >= 0 ||
+              txt.toLowerCase().indexOf("all platforms") >= 0) {
+            a.href = "#download";
+          }
+
           // "Попробовать онлайн" / "Try Online" — live demo button (hero + footer)
           var txtLowTry = txt.toLowerCase();
           if (txtLowTry.indexOf("\\u043f\\u043e\\u043f\\u0440\\u043e\\u0431\\u043e\\u0432\\u0430\\u0442\\u044c") >= 0 ||
@@ -267,7 +273,14 @@ PATCH = """\
         }
 
         var p = platforms[detected];
-        headerBtn.textContent = p.text;
+        var svgEl = headerBtn.querySelector("svg");
+        if (svgEl) {
+          headerBtn.innerHTML = "";
+          headerBtn.appendChild(svgEl);
+          headerBtn.appendChild(document.createTextNode(" " + p.text));
+        } else {
+          headerBtn.textContent = p.text;
+        }
         headerBtn.href = p.href;
         headerBtn.target = "_blank";
         headerBtn.rel = "noopener noreferrer";
