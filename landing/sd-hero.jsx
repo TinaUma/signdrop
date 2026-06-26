@@ -224,8 +224,8 @@ function Hero({ t, lang, setLang }) {
 
         {/* RIGHT — badge above, document, playful hint below */}
         <div className="sd-hero-doc" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: 2.5, opacity: 0.72, display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ width: 7, height: 7, background: "#fff", borderRadius: "50%" }} />
+          <div className="sd-hero-badge" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: 2.5, opacity: 0.72, display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ width: 7, height: 7, background: "#fff", borderRadius: "50%", flexShrink: 0 }} />
             {t.hero.badge}
           </div>
 
@@ -235,7 +235,7 @@ function Hero({ t, lang, setLang }) {
             <MiniDocDemo width={380} height={480} labels={{ signed: lang === "ru" ? "ПОДПИСАНО · ЛОКАЛЬНО" : "SIGNED · LOCAL" }} />
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: 1.5, color: "#aebcff", opacity: 0.85 }}>
+          <div className="sd-hero-hint" style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: 1.5, color: "#aebcff", opacity: 0.85 }}>
             <LineIcon name="scribble" size={16} /> {t.hero.hint}
           </div>
         </div>
